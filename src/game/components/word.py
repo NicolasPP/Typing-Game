@@ -1,11 +1,12 @@
 from pygame import Rect
 from pygame import Surface
+from pygame.math import Vector2
 
+from config.game_config import SPAWN_DELAY
 from game.components.letter import Letter
 from game.components.letter import LetterState
 from utils.accumulator import Accumulator
 from utils.word_data_manager import WordDataManager
-from config.game_config import SPAWN_DELAY
 
 
 class Word:
@@ -14,6 +15,11 @@ class Word:
         self.letters: list[Letter] = [Letter(char) for char in word]
         self.surface: Surface = self.create_surface()
         self.rect: Rect = Rect(0, 0, *self.surface.get_size())
+        self.pos: Vector2 = Vector2(0, 0)
+
+    def set_pos(self, pos: Vector2) -> None:
+        self.rect.x, self.rect.y = round(pos.x), round(pos.y)
+        self.pos = pos
 
     def set_letter_state(self, index: int, state: LetterState):
         assert len(self.letters) > index >= 0, f"index: {index} out of bounds"
@@ -42,17 +48,29 @@ class Word:
     def render(self, parent_surface: Surface) -> None:
         parent_surface.blit(self.surface, self.rect)
 
+    def fall(self, delta_time: float, speed: float) -> None:
+        distance: float = delta_time * speed
+        self.set_pos(self.pos + Vector2(0, distance))
+
 
 class WordManager:
     def __init__(self) -> None:
         self.words: list[Word] = []
-        self.played_words: set[str] = set()
+        self.played_words: list[str] = []
         self.spawn_accumulator: Accumulator = Accumulator(SPAWN_DELAY)
         self.stop_spawning: bool = False
 
-    def spawn_word(self, delta_time: float) -> None:
+    def spawn_word(self, word_lengths: list[int]) -> None:
+        print(word_lengths)
         if self.stop_spawning: return
-        if not self.spawn_accumulator.wait(delta_time): return
-        word: str = WordDataManager.get_random_word()
-        self.played_words.add(word)
+        word: str = WordDataManager.get_random_word(word_lengths=word_lengths)
+        self.played_words.append(word)
         self.words.append(Word(word))
+
+    def render(self, parent_surface: Surface) -> None:
+        for word in self.words:
+            word.render(parent_surface)
+
+    def update(self, delta_time: float, speed: float) -> None:
+        for word in self.words:
+            word.fall(delta_time, speed)
