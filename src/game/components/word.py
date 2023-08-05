@@ -79,13 +79,9 @@ class WordManager:
         for word in self.words:
             word.fall(delta_time, speed)
 
-    def get_collided_words(self, board_height: int) -> list[Word]:
-        collided_words: list[Word] = []
-        for word in self.words:
-            if word.rect.bottom >= board_height:
-                collided_words.append(word)
-
-        for word in collided_words:
-            self.words.remove(word)
-
-        return collided_words
+    def is_collided(self, board_height: int) -> bool:
+        if len(self.words) == 0: return False
+        is_collided: bool = self.words[0].rect.bottom > board_height
+        if is_collided:
+            self.words = self.words[1:]
+        return is_collided

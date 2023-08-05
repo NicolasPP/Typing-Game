@@ -1,12 +1,12 @@
 from game.components.board import Board
 from game.components.level import LevelManager
-from game.components.word import Word
 from game.components.word import WordManager
 
 
 class GameState:
 
     def __init__(self, board_width: int, board_height: int) -> None:
+        self.lives: int = 5
         self.board: Board = Board(board_width, board_height)
         self.level_manager: LevelManager = LevelManager()
         self.word_manager: WordManager = WordManager()
@@ -22,4 +22,5 @@ class GameState:
 
         self.word_manager.update(delta_time, self.level_manager.get_speed())
 
-        collided_words: list[Word] = self.word_manager.get_collided_words(self.board.rect.height)
+        if self.word_manager.is_collided(self.board.rect.height):
+            self.lives -= 1
