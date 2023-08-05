@@ -1,15 +1,15 @@
-from time import time
-
 from pygame import QUIT
 from pygame import display
 from pygame import event
 from pygame import font
+from time import time
 
 from game.components.letter import Letter
 from game.game_screen import GameScreen
 from game.game_state import GameState
 from utils.themes import ThemeManager
 from utils.word_data_manager import WordDataManager
+
 
 class GameApp:
 
@@ -21,7 +21,7 @@ class GameApp:
 
         self.state: GameState = GameState(600, 600)
         self.done: bool = False
-        self.prev_time: float = 0.0
+        self.prev_time: float = time()
         self.delta_time: float = 0.0
 
     def run(self) -> None:
