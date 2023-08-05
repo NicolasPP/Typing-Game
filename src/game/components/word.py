@@ -67,7 +67,8 @@ class WordManager:
         word: str = WordDataManager.get_random_word(word_lengths=word_lengths)
         self.played_words.append(word)
         word_obj: Word = Word(word)
-        word_obj.set_pos(Vector2(randrange(0, board_width - word_obj.rect.width), 0))
+        word_pos: Vector2 = Vector2(Vector2(randrange(0, board_width - word_obj.rect.width), -1 * word_obj.rect.height))
+        word_obj.set_pos(word_pos)
         self.words.append(word_obj)
 
     def render(self, parent_surface: Surface) -> None:
