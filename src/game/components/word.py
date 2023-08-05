@@ -74,3 +74,14 @@ class WordManager:
     def update(self, delta_time: float, speed: float) -> None:
         for word in self.words:
             word.fall(delta_time, speed)
+
+    def get_collided_words(self, board_rect: Rect) -> list[Word]:
+        collided_words: list[Word] = []
+        for word in self.words:
+            if word.rect.bottom >= board_rect.height:
+                collided_words.append(word)
+
+        for word in collided_words:
+            self.words.remove(word)
+
+        return collided_words
