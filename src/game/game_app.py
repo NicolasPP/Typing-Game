@@ -9,13 +9,14 @@ from game.components.letter import Letter
 from game.game_screen import GameScreen
 from game.game_state import GameState
 from utils.themes import ThemeManager
-
+from utils.word_data_manager import WordDataManager
 
 class GameApp:
 
     def __init__(self) -> None:
         ThemeManager.load_themes()
         Letter.load_state_colors()
+        WordDataManager.load_words()
         font.init()
 
         self.state: GameState = GameState(600, 600)
