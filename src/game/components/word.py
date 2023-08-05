@@ -1,3 +1,5 @@
+from random import randrange
+
 from pygame import Rect
 from pygame import Surface
 from pygame.math import Vector2
@@ -60,12 +62,13 @@ class WordManager:
         self.spawn_accumulator: Accumulator = Accumulator(SPAWN_DELAY)
         self.stop_spawning: bool = False
 
-    def spawn_word(self, word_lengths: list[int]) -> None:
-        print(word_lengths)
+    def spawn_word(self, word_lengths: list[int], board_width: int) -> None:
         if self.stop_spawning: return
         word: str = WordDataManager.get_random_word(word_lengths=word_lengths)
         self.played_words.append(word)
-        self.words.append(Word(word))
+        word_obj: Word = Word(word)
+        word_obj.set_pos(Vector2(randrange(0, board_width - word_obj.rect.width), 0))
+        self.words.append(word_obj)
 
     def render(self, parent_surface: Surface) -> None:
         for word in self.words:
@@ -75,10 +78,10 @@ class WordManager:
         for word in self.words:
             word.fall(delta_time, speed)
 
-    def get_collided_words(self, board_rect: Rect) -> list[Word]:
+    def get_collided_words(self, board_height: int) -> list[Word]:
         collided_words: list[Word] = []
         for word in self.words:
-            if word.rect.bottom >= board_rect.height:
+            if word.rect.bottom >= board_height:
                 collided_words.append(word)
 
         for word in collided_words:
