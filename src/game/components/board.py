@@ -28,10 +28,13 @@ class Board:
         ThemeManager.add_call_back(self.theme_call_back)
 
     def init_board_surface(self) -> None:
-        self.surface.fill(self.config.background_color)
+        self.clear()
 
     def render(self) -> None:
         display.get_surface().blit(self.surface, self.rect)
+
+    def clear(self) -> None:
+        self.surface.fill(self.config.background_color)
 
     def theme_call_back(self) -> None:
         self.config.background_color = ThemeManager.get_theme().foreground_primary
