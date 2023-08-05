@@ -36,7 +36,7 @@ class Letter:
         anti_alias: bool = True
         color: tuple[int, int, int] | None = Letter.state_colors.get(self.state)
         assert color is not None, f"state's {self.state.name} color value has not been loaded"
-        return font.render(self.val, anti_alias, color)
+        return font.render(self.val, anti_alias, color, ThemeManager.get_theme().foreground_primary)
 
     def set_state(self, state: LetterState) -> None:
         self.state = state

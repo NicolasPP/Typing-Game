@@ -35,7 +35,7 @@ class ThemeManager:
     @staticmethod
     def get_theme() -> Theme:
         if ThemeManager.current_theme is None:
-            ThemeManager.set_current_theme(ThemeType.LIGHT)
+            ThemeManager.set_current_theme(ThemeType.DARK)
 
         return ThemeManager.current_theme
 
