@@ -5,7 +5,8 @@ from config.game_config import WORDS_FILE_MODE
 
 
 class WordDataManager:
-    words_by_length: dict[int, set[str]] = {}
+    words_by_length: dict[int, list[str]] = {}
+    words: list[str] = []
 
     @staticmethod
     def load_words() -> None:
@@ -13,31 +14,36 @@ class WordDataManager:
 
             for word in word_file.read().split():
                 word_length: int = len(word)
+                WordDataManager.words.append(word)
                 if word_length in WordDataManager.words_by_length:
-                    WordDataManager.words_by_length[word_length].add(word)
+                    WordDataManager.words_by_length[word_length].append(word)
                 else:
-                    WordDataManager.words_by_length[word_length] = {word}
+                    WordDataManager.words_by_length[word_length] = [word]
 
     @staticmethod
-    def get_random_word(word_length: int | None = None, played_words: set[str] | None = None) -> str:
-        if word_length is None or word_length not in WordDataManager.words_by_length:
-            possible_words = WordDataManager.get_all_words()
+    def get_random_word(word_lengths: list[int] | None = None, played_words: list[str] | None = None) -> str:
+        possible_words: list[str] = []
+        if word_lengths is None:
+            possible_words = WordDataManager.words
 
         else:
-            possible_words = WordDataManager.words_by_length[word_length]
+            for length in word_lengths:
+                if length not in WordDataManager.words_by_length: continue
+                possible_words.extend(WordDataManager.words_by_length[length])
 
-        if played_words is not None:
-            possible_words -= played_words
+            if len(possible_words) == 0:
+                possible_words = WordDataManager.words
 
-        if len(possible_words) == 0:
-            # FIXME this is no good, icky. maybe get another word
-            raise Exception(f"no words with length {word_length} available")
+        if possible_words == played_words:
+            # assuming a player wont use all the words in the dictionary in one game
+            possible_words = WordDataManager.words
 
-        return choice(list(possible_words))
+        word: str = choice(possible_words)
 
-    @staticmethod
-    def get_all_words() -> set[str]:
-        all_words: set[str] = set()
-        for words in WordDataManager.words_by_length.values():
-            all_words = all_words.union(words)
-        return all_words
+        if played_words is None:
+            return word
+
+        while word in played_words:
+            word = choice(possible_words)
+
+        return word
