@@ -3,6 +3,9 @@ from pygame import Surface
 
 from game.components.letter import Letter
 from game.components.letter import LetterState
+from utils.accumulator import Accumulator
+from utils.word_data_manager import WordDataManager
+from config.game_config import SPAWN_DELAY
 
 
 class Word:
@@ -38,3 +41,18 @@ class Word:
 
     def render(self, parent_surface: Surface) -> None:
         parent_surface.blit(self.surface, self.rect)
+
+
+class WordManager:
+    def __init__(self) -> None:
+        self.words: list[Word] = []
+        self.played_words: set[str] = set()
+        self.spawn_accumulator: Accumulator = Accumulator(SPAWN_DELAY)
+        self.stop_spawning: bool = False
+
+    def spawn_word(self, delta_time: float) -> None:
+        if self.stop_spawning: return
+        if not self.spawn_accumulator.wait(delta_time): return
+        word: str = WordDataManager.get_random_word()
+        self.played_words.add(word)
+        self.words.append(Word(word))
