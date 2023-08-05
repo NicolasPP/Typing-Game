@@ -9,6 +9,8 @@ from game.game_screen import GameScreen
 from game.game_state import GameState
 from utils.themes import ThemeManager
 from utils.word_data_manager import WordDataManager
+from config.game_config import BOARD_WIDTH
+from config.game_config import BOARD_HEIGHT
 
 
 class GameApp:
@@ -19,7 +21,7 @@ class GameApp:
         WordDataManager.load_words()
         font.init()
 
-        self.state: GameState = GameState(600, 600)
+        self.state: GameState = GameState(BOARD_WIDTH, BOARD_HEIGHT)
         self.done: bool = False
         self.prev_time: float = time()
         self.delta_time: float = 0.0
