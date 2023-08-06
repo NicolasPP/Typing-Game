@@ -24,7 +24,8 @@ class GameState:
         if self.word_manager.spawn_accumulator.wait(delta_time):
             self.word_manager.spawn_word(self.level_manager.get_word_lengths(), self.board.rect.width)
 
-        self.word_manager.update(delta_time, self.level_manager.get_speed())
+        self.word_manager.update(delta_time, self.level_manager.get_speed(),
+                                 self.level_manager.increment_completed_words)
 
         if self.word_manager.is_collided(self.board.rect.height):
             self.lives -= 1

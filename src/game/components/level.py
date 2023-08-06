@@ -5,6 +5,9 @@ class LevelManager:
         self.completed_words: int = 0
         self.speed: float = STARTING_SPEED
 
+    def increment_completed_words(self) -> None:
+        self.completed_words += 1
+
     def get_speed(self) -> float:
         return self.speed + (self.completed_words * 2)
 

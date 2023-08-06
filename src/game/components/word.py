@@ -1,19 +1,20 @@
 from random import randrange
+from typing import Callable
 
-from pygame import Rect
-from pygame.draw import line
-from pygame import Surface
-from pygame.math import Vector2
-from pygame.key import name
 from pygame import K_BACKSPACE
+from pygame import Rect
+from pygame import Surface
+from pygame.draw import line
+from pygame.key import name
+from pygame.math import Vector2
 
-from config.game_config import SPAWN_DELAY
 from config.game_config import OUTLINE_THICKNESS
+from config.game_config import SPAWN_DELAY
 from game.components.letter import Letter
 from game.components.letter import LetterState
 from utils.accumulator import Accumulator
-from utils.word_data_manager import WordDataManager
 from utils.themes import ThemeManager
+from utils.word_data_manager import WordDataManager
 
 
 class Word:
@@ -117,12 +118,13 @@ class WordManager:
         for word in self.words:
             word.render(parent_surface)
 
-    def update(self, delta_time: float, speed: float) -> None:
+    def update(self, delta_time: float, speed: float, inc_completed_words: Callable[[], None]) -> None:
         for word in self.words:
             word.fall(delta_time, speed)
         current_word: Word | None = self.get_current_word()
         if current_word is None: return
         if current_word.is_correct():
+            inc_completed_words()
             self.remove_first_word()
 
     def remove_first_word(self) -> None:
