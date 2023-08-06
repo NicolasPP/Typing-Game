@@ -31,4 +31,4 @@ class GameState:
 
     def parse_player_input(self, game_event: Event):
         if game_event.type == KEYDOWN:
-            self.word_manager.process_key_name(name(game_event.key))
+            self.word_manager.process_key_name(game_event.key)
