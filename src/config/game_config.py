@@ -4,6 +4,7 @@ BOARD_WIDTH: int = 1120
 BOARD_HEIGHT: int = 630
 DEFAULT_LETTER_SIZE: int = 35
 STARTING_SPEED: float = 50
+OUTLINE_THICKNESS: int = 5
 SPAWN_DELAY: float = 2  # Seconds
 
 # -- files --
