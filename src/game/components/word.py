@@ -85,3 +85,7 @@ class WordManager:
         if is_collided:
             self.words = self.words[1:]
         return is_collided
+
+    def process_key_name(self, key_name: str) -> None:
+        if len(key_name) != 1 or not key_name.isalpha(): return
+        print(key_name)

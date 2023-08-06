@@ -1,3 +1,7 @@
+from pygame import KEYDOWN
+from pygame.event import Event
+from pygame.key import name
+
 from game.components.board import Board
 from game.components.level import LevelManager
 from game.components.word import WordManager
@@ -24,3 +28,7 @@ class GameState:
 
         if self.word_manager.is_collided(self.board.rect.height):
             self.lives -= 1
+
+    def parse_player_input(self, game_event: Event):
+        if game_event.type == KEYDOWN:
+            self.word_manager.process_key_name(name(game_event.key))
