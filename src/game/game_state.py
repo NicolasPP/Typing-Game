@@ -1,6 +1,5 @@
 from pygame import KEYDOWN
 from pygame.event import Event
-from pygame.key import name
 
 from game.components.board import Board
 from game.components.level import LevelManager
