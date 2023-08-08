@@ -68,7 +68,7 @@ class GameState:
     def spawn_text(self) -> None:
         if self.stop_spawning: return
         word_values: list[str] = []
-        target_length: int = 6
+        target_length: int = LevelManager.roll_text_length()
 
         while len(word_values) < target_length:
             word_val: str = WordDataManager.get_random_word(played_words=self.played_words,
