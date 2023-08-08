@@ -12,9 +12,8 @@ class CallBack:
         self.value = value
         self.exec_callbacks()
 
-    def exec_callbacks(self, x=print(func.__name__)) -> None:
+    def exec_callbacks(self) -> None:
         for func in self.callbacks:
-            x
             func(self.value)
 
     def add_callback(self, callback_func: typing.Callable[[CallbackTypes], None]) -> None:
