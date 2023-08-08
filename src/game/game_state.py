@@ -103,8 +103,8 @@ class GameState:
         if len(key_name) != 1 or not key_name.isalpha(): return
         current_text.add_pressed_key(key_name)
         if current_text.get_current_word().is_correct():
-            current_text.update_counter_surface()
             current_text.remove_word()
+            current_text.update_counter_surface()
             self.level_manager.set_completed_words(self.level_manager.completed_words + 1)
 
     def end_game(self, lives_count: int) -> None:
