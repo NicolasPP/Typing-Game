@@ -1,15 +1,12 @@
-from random import randrange
-
 from pygame import KEYDOWN
 from pygame import K_BACKSPACE
 from pygame.event import Event
 from pygame.key import name
-from pygame.math import Vector2
 
 from config.game_config import SPAWN_DELAY
 from game.components.board import Board
 from game.components.level import LevelManager
-from game.components.word import Word
+from game.components.text import Text
 from gui.gui_manager import GuiManager
 from gui.gui_vars import GuiVars
 from utils.accumulator import Accumulator
@@ -22,80 +19,93 @@ class GameState:
         self.board: Board = Board(board_width, board_height)
         self.level_manager: LevelManager = LevelManager()
         self.gui_manager: GuiManager = GuiManager(self.board.rect)
-        self.words: list[Word] = []
-        self.played_words: list[str] = []
         self.spawn_accumulator: Accumulator = Accumulator(SPAWN_DELAY)
+
+        self.texts: list[Text] = []
+        self.played_words: list[str] = []
+
         self.stop_spawning: bool = False
         self.game_over: bool = False
-        self.current_word: Word | None = None
+        self.current_text: Text | None = None
+
         GuiVars.lives.add_callback(self.end_game)
 
     def render(self) -> None:
         self.board.clear()
-        for word in self.words:
-            word.render(self.board.surface)
+        for text in self.texts:
+            text.render(self.board.surface)
         self.board.render()
         self.gui_manager.render()
 
     def update(self, delta_time: float) -> None:
         if self.game_over: return
         if self.spawn_accumulator.wait(delta_time):
-            self.spawn_word()
+            self.spawn_text()
 
         # update words
-        for word in self.words:
-            word.fall(delta_time, self.level_manager.get_speed())
+        for text in self.texts:
+            text.fall(delta_time, self.level_manager.get_speed())
 
-        current_word: Word | None = self.get_current_word()
-        if current_word is None: return
-        if current_word.is_correct():
-            self.level_manager.set_completed_words(self.level_manager.completed_words + 1)
-            self.remove_first_word()
+        current_text: Text | None = self.get_current_text()
+        if current_text is None: return
+        if current_text.is_done():
+            self.remove_fist_text()
 
-        if self.is_word_collided():
+        if self.is_text_collided():
             GuiVars.lives.set(GuiVars.lives.get() - 1)
 
     def parse_player_input(self, game_event: Event):
         if game_event.type == KEYDOWN:
             self.process_key_name(game_event.key)
 
-    def add_word(self, word_value: str) -> None:
-        self.played_words.append(word_value)
-        word: Word = Word(word_value)
-        word.set_pos(Vector2(Vector2(randrange(0, self.board.rect.width - word.rect.width), -1 * word.rect.height)))
-        if len(self.words) == 0: word.underline()
-        self.words.append(word)
+    def add_text(self, word_values: list[str]) -> None:
+        text: Text = Text(word_values)
+        text.set_random_pos(self.board.rect.width)
+        if len(self.texts) == 0: text.underline_current_word()
+        self.texts.append(text)
 
-    def spawn_word(self) -> None:
+    def spawn_text(self) -> None:
         if self.stop_spawning: return
-        word_val: str = WordDataManager.get_random_word(word_lengths=self.level_manager.get_word_lengths())
-        self.add_word(word_val)
+        word_values: list[str] = []
+        target_length: int = LevelManager.roll_text_length()
 
-    def remove_first_word(self) -> None:
-        self.words = self.words[1:]
-        word: Word | None = self.get_current_word()
-        if word is None: return
-        word.underline()
+        while len(word_values) < target_length:
+            word_val: str = WordDataManager.get_random_word(played_words=self.played_words,
+                                                            word_lengths=self.level_manager.get_word_lengths())
+            word_values.append(word_val)
+            self.played_words.append(word_val)
 
-    def is_word_collided(self) -> bool:
-        current_word: Word | None = self.get_current_word()
-        if current_word is None: return False
-        is_collided: bool = self.words[0].rect.bottom > self.board.rect.height
-        if is_collided: self.remove_first_word()
+        self.add_text(word_values)
+
+    def remove_fist_text(self) -> None:
+        self.texts = self.texts[1:]
+        text: Text | None = self.get_current_text()
+        if text is None: return
+        text.underline_current_word()
+
+    def is_text_collided(self) -> bool:
+        current_text: Text | None = self.get_current_text()
+        if current_text is None: return False
+        is_collided: bool = current_text.get_current_word().rect.bottom > self.board.rect.height
+        if is_collided: self.remove_fist_text()
         return is_collided
 
-    def get_current_word(self) -> Word | None:
-        if len(self.words) == 0: return None
-        return self.words[0]
+    def get_current_text(self) -> Text | None:
+        if len(self.texts) == 0: return None
+        return self.texts[0]
 
     def process_key_name(self, key_code: int) -> None:
-        current_word: Word | None = self.get_current_word()
-        if current_word is None: return
+        current_text: Text | None = self.get_current_text()
+        if current_text is None: return
         if key_code == K_BACKSPACE:
-            current_word.process_backspace()
+            current_text.process_backspace()
         key_name: str = name(key_code)
         if len(key_name) != 1 or not key_name.isalpha(): return
-        current_word.add_pressed_key(key_name)
+        current_text.add_pressed_key(key_name)
+        if current_text.get_current_word().is_correct():
+            current_text.update_counter_surface()
+            current_text.remove_word()
+            self.level_manager.set_completed_words(self.level_manager.completed_words + 1)
 
     def end_game(self, lives_count: int) -> None:
         if lives_count == 0:
