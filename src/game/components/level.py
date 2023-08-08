@@ -8,7 +8,6 @@ class LevelManager:
 
     @staticmethod
     def roll_text_length() -> int:
-        # TODO change the percentage based on the users score
         """
         length
             = 1 - 65 %
