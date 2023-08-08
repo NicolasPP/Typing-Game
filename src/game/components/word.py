@@ -1,5 +1,4 @@
 from random import randrange
-from typing import Callable
 
 from pygame import K_BACKSPACE
 from pygame import Rect
@@ -117,15 +116,6 @@ class WordManager:
     def render(self, parent_surface: Surface) -> None:
         for word in self.words:
             word.render(parent_surface)
-
-    def update(self, delta_time: float, speed: float, inc_completed_words: Callable[[], None]) -> None:
-        for word in self.words:
-            word.fall(delta_time, speed)
-        current_word: Word | None = self.get_current_word()
-        if current_word is None: return
-        if current_word.is_correct():
-            inc_completed_words()
-            self.remove_first_word()
 
     def remove_first_word(self) -> None:
         self.words = self.words[1:]
