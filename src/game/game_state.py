@@ -52,7 +52,8 @@ class GameState:
             self.remove_fist_text()
 
         if self.is_text_collided():
-            GuiVars.lives.set(GuiVars.lives.get() - 1)
+            self.texts.clear()
+            GuiVars.lives.set(GuiVars.lives.get() - len(current_text.words))
 
     def parse_player_input(self, game_event: Event):
         if game_event.type == KEYDOWN:
@@ -67,7 +68,7 @@ class GameState:
     def spawn_text(self) -> None:
         if self.stop_spawning: return
         word_values: list[str] = []
-        target_length: int = LevelManager.roll_text_length()
+        target_length: int = 6
 
         while len(word_values) < target_length:
             word_val: str = WordDataManager.get_random_word(played_words=self.played_words,
@@ -108,5 +109,5 @@ class GameState:
             self.level_manager.set_completed_words(self.level_manager.completed_words + 1)
 
     def end_game(self, lives_count: int) -> None:
-        if lives_count == 0:
+        if lives_count <= 0:
             self.game_over = True
