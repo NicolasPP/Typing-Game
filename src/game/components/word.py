@@ -1,6 +1,6 @@
 from pygame import Rect
 from pygame import Surface
-from pygame.draw import line
+from pygame import draw
 from pygame.math import Vector2
 
 from config.game_config import OUTLINE_THICKNESS
@@ -18,7 +18,7 @@ class Word:
         self.pos: Vector2 = Vector2(0, 0)
         self.pressed_key_index: int = -1
 
-    def process_backspace(self) -> None:
+    def delete_char(self) -> None:
         if self.pressed_key_index == -1: return
         self.set_letter_state(self.pressed_key_index, LetterState.EMPTY)
         self.pressed_key_index -= 1
@@ -27,7 +27,7 @@ class Word:
         self.typed_value = self.typed_value[:typed_value_size - 1]
         self.underline(len(self.typed_value))
 
-    def add_pressed_key(self, key: str) -> None:
+    def add_char(self, key: str) -> None:
         if self.pressed_key_index + 1 >= len(self.letters): return
         self.pressed_key_index += 1
         self.typed_value += key
@@ -75,8 +75,8 @@ class Word:
     def underline(self, start_index: int = 0) -> None:
         if start_index >= len(self.letters) or start_index < 0: return
         start_rect: Rect = self.letters[start_index].rect
-        line(self.surface, ThemeManager.get_theme().background_primary, start_rect.bottomleft,
-             self.surface.get_rect().bottomright, OUTLINE_THICKNESS)
+        draw.line(self.surface, ThemeManager.get_theme().background_primary, start_rect.bottomleft,
+                  self.surface.get_rect().bottomright, OUTLINE_THICKNESS)
 
     def is_correct(self) -> bool:
         letters_size: int = len(self.letters)
