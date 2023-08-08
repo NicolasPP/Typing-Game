@@ -12,6 +12,7 @@ GUI_GAP: int = 5
 STARTING_SPEED: float = 30
 OUTLINE_THICKNESS: int = 5
 SPAWN_DELAY: float = 3  # Seconds
+BASE_LIVES_COUNT: int = 3
 
 # -- files --
 WORDS_FILE: str = "data/words/words_alpha.txt"
