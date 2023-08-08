@@ -5,7 +5,9 @@ from pygame import Rect
 from pygame import Surface
 from pygame.font import Font
 
+from config.game_config import CORRECT_COLOR
 from config.game_config import LETTER_FONT_SIZE
+from config.game_config import WRONG_COLOR
 from utils.fonts import FontManager
 from utils.themes import ThemeManager
 
@@ -21,8 +23,8 @@ class Letter:
 
     @staticmethod
     def load_state_colors() -> None:
-        Letter.state_colors[LetterState.RIGHT] = (0, 255, 0)
-        Letter.state_colors[LetterState.WRONG] = (255, 0, 0)
+        Letter.state_colors[LetterState.RIGHT] = CORRECT_COLOR
+        Letter.state_colors[LetterState.WRONG] = WRONG_COLOR
         Letter.state_colors[LetterState.EMPTY] = ThemeManager.get_theme().background_primary
 
     def __init__(self, letter: str) -> None:
