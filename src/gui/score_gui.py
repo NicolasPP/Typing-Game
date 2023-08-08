@@ -2,14 +2,14 @@ from pygame import Rect
 from pygame import Surface
 from pygame.font import Font
 
+from config.game_config import SCORE_FONT_SIZE
 from game.game_screen import GameScreen
-from gui.gui_vars import GuiVars
-from utils.themes import ThemeManager
-from utils.themes import Theme
 from gui.gui_component import GuiComponent
+from gui.gui_vars import GuiVars
 from utils.callback_vars import CallbackTypes
 from utils.fonts import FontManager
-from config.game_config import SCORE_FONT_SIZE
+from utils.themes import Theme
+from utils.themes import ThemeManager
 
 
 class ScoreGui(GuiComponent):

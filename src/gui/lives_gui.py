@@ -2,14 +2,13 @@ from pygame import Rect
 from pygame import Surface
 from pygame import draw
 
+from config.game_config import GUI_GAP
 from config.game_config import LIFE_SURF_SIZE
 from game.game_screen import GameScreen
 from gui.gui_component import GuiComponent
 from gui.gui_vars import GuiVars
 from utils.callback_vars import CallbackTypes
 from utils.themes import ThemeManager
-from config.game_config import LIFE_RADIUS
-from config.game_config import GUI_GAP
 
 
 class LivesGui(GuiComponent):
@@ -19,7 +18,7 @@ class LivesGui(GuiComponent):
         surface: Surface = Surface((LIFE_SURF_SIZE, LIFE_SURF_SIZE))
         surface.fill(ThemeManager.get_theme().background_primary)
         draw.circle(surface, ThemeManager.get_theme().foreground_primary, surface.get_rect().center,
-                    (LIFE_RADIUS) // 2)
+                    ((LIFE_SURF_SIZE - GUI_GAP) // 2))
         return surface
 
     def __init__(self, board_rect: Rect) -> None:
