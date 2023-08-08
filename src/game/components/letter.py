@@ -5,9 +5,10 @@ from pygame import Rect
 from pygame import Surface
 from pygame.font import Font
 
+from config.game_config import LETTER_FONT_SIZE
 from utils.fonts import FontManager
 from utils.themes import ThemeManager
-from config.game_config import DEFAULT_LETTER_SIZE
+
 
 class LetterState(Enum):
     RIGHT = auto()
@@ -32,7 +33,7 @@ class Letter:
         self.rect: Rect = Rect(0, 0, *self.surface.get_size())
 
     def create_surface(self) -> Surface:
-        font: Font = FontManager.get_font(DEFAULT_LETTER_SIZE)
+        font: Font = FontManager.get_font(LETTER_FONT_SIZE)
         anti_alias: bool = True
         color: tuple[int, int, int] | None = Letter.state_colors.get(self.state)
         assert color is not None, f"state's {self.state.name} color value has not been loaded"
