@@ -1,3 +1,5 @@
+from math import ceil
+
 from pygame import Rect
 from pygame import Surface
 from pygame import draw
@@ -8,6 +10,7 @@ from game.game_screen import GameScreen
 from gui.gui_component import GuiComponent
 from gui.gui_vars import GuiVars
 from utils.callback_vars import CallbackTypes
+from utils.themes import Theme
 from utils.themes import ThemeManager
 
 
@@ -17,8 +20,22 @@ class LivesGui(GuiComponent):
     def get_life_surface() -> Surface:
         surface: Surface = Surface((LIFE_SURF_SIZE, LIFE_SURF_SIZE))
         surface.fill(ThemeManager.get_theme().background_primary)
-        draw.circle(surface, ThemeManager.get_theme().foreground_primary, surface.get_rect().center,
-                    ((LIFE_SURF_SIZE - GUI_GAP) // 2))
+        theme: Theme = ThemeManager.get_theme()
+        draw.circle(surface, theme.foreground_primary, surface.get_rect().center, ((LIFE_SURF_SIZE - GUI_GAP) // 2))
+        # drawing heart
+        scale: float = min(surface.get_width(), surface.get_height()) * 0.4
+        width: int = int(scale)
+        height: int = int(scale * 1.45)
+
+        # Calculate heart position
+        x, y = surface.get_rect().center
+        y += ceil(LIFE_SURF_SIZE / 10) - 1
+
+        draw.polygon(surface, theme.background_primary,
+                     [(x, y + height // 4), (x - width // 2, y - height // 4), (x + width // 2, y - height // 4)])
+        draw.circle(surface, theme.background_primary, (x - width // 4, y - height // 4), width // 4)
+        draw.circle(surface, theme.background_primary, (x + width // 4, y - height // 4), width // 4)
+
         return surface
 
     def __init__(self, board_rect: Rect) -> None:
