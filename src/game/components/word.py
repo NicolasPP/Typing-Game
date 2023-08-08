@@ -1,19 +1,12 @@
-from random import randrange
-
-from pygame import K_BACKSPACE
 from pygame import Rect
 from pygame import Surface
 from pygame.draw import line
-from pygame.key import name
 from pygame.math import Vector2
 
 from config.game_config import OUTLINE_THICKNESS
-from config.game_config import SPAWN_DELAY
 from game.components.letter import Letter
 from game.components.letter import LetterState
-from utils.accumulator import Accumulator
 from utils.themes import ThemeManager
-from utils.word_data_manager import WordDataManager
 
 
 class Word:
@@ -91,54 +84,3 @@ class Word:
         for letter_index in range(letters_size):
             if self.typed_value[letter_index] != self.letters[letter_index].val: return False
         return True
-
-
-class WordManager:
-    def __init__(self) -> None:
-        self.words: list[Word] = []
-        self.played_words: list[str] = []
-        self.spawn_accumulator: Accumulator = Accumulator(SPAWN_DELAY)
-        self.stop_spawning: bool = False
-        self.current_word: Word | None = None
-
-    def add_word(self, word_value: str, board_width: int) -> None:
-        self.played_words.append(word_value)
-        word: Word = Word(word_value)
-        word.set_pos(Vector2(Vector2(randrange(0, board_width - word.rect.width), -1 * word.rect.height)))
-        if len(self.words) == 0: word.underline()
-        self.words.append(word)
-
-    def spawn_word(self, word_lengths: list[int], board_width: int) -> None:
-        if self.stop_spawning: return
-        word_val: str = WordDataManager.get_random_word(word_lengths=word_lengths)
-        self.add_word(word_val, board_width)
-
-    def render(self, parent_surface: Surface) -> None:
-        for word in self.words:
-            word.render(parent_surface)
-
-    def remove_first_word(self) -> None:
-        self.words = self.words[1:]
-        word: Word | None = self.get_current_word()
-        if word is None: return
-        word.underline()
-
-    def is_collided(self, board_height: int) -> bool:
-        current_word: Word | None = self.get_current_word()
-        if current_word is None: return False
-        is_collided: bool = self.words[0].rect.bottom > board_height
-        if is_collided: self.remove_first_word()
-        return is_collided
-
-    def get_current_word(self) -> Word | None:
-        if len(self.words) == 0: return None
-        return self.words[0]
-
-    def process_key_name(self, key_code: int) -> None:
-        current_word: Word | None = self.get_current_word()
-        if current_word is None: return
-        if key_code == K_BACKSPACE:
-            current_word.process_backspace()
-        key_name: str = name(key_code)
-        if len(key_name) != 1 or not key_name.isalpha(): return
-        current_word.add_pressed_key(key_name)
