@@ -28,6 +28,7 @@ class LivesGui(GuiComponent):
 
     def update_surface(self, value: CallbackTypes) -> None:
         assert isinstance(value, int), f"value should be {type(GuiVars.lives.get())} rather than {type(value)}"
+        if value < 0: value = 0
         lives_surface: Surface = Surface((LIFE_SURF_SIZE * value, LIFE_SURF_SIZE))
         prev_rect: Rect | None = None
         for _ in range(value):
