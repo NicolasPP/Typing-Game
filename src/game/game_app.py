@@ -5,11 +5,13 @@ from pygame import display
 from pygame import event
 from pygame import font
 
-from config.game_config import BOARD_HEIGHT
-from config.game_config import BOARD_WIDTH
 from game.components.letter import Letter
 from game.game_screen import GameScreen
-from game.game_state import GameState
+from gui.pages.game_page import GamePage
+from gui.pages.menu_page import MenuPage
+from gui.pages.page import Page
+from gui.pages.page_manager import PageManager
+from gui.pages.score_page import ScorePage
 from utils.themes import ThemeManager
 from utils.word_data_manager import WordDataManager
 
@@ -22,26 +24,35 @@ class GameApp:
         WordDataManager.load_words()
         font.init()
 
-        self.state: GameState = GameState(BOARD_WIDTH, BOARD_HEIGHT)
+        self.page_manager: PageManager = PageManager()
         self.done: bool = False
         self.prev_time: float = time()
         self.delta_time: float = 0.0
+
+        self.page_manager.add_page(MenuPage)
+        self.page_manager.add_page(GamePage)
+        self.page_manager.add_page(ScorePage)
+        self.page_manager.set_page(GamePage)
+
+    def set_delta_time(self) -> None:
+        now: float = time()
+        self.delta_time = now - self.prev_time
+        self.prev_time = now
 
     def run(self) -> None:
 
         while not self.done:
 
-            now: float = time()
-            self.delta_time = now - self.prev_time
-            self.prev_time = now
+            page: Page = self.page_manager.get_page()
+            self.set_delta_time()
 
             for game_event in event.get():
                 if game_event.type == QUIT:
                     self.done = True
                 else:
-                    self.state.parse_player_input(game_event)
+                    page.parse_event(game_event)
 
             GameScreen.get().clear()
-            self.state.update(self.delta_time)
-            self.state.render()
+            page.update(self.delta_time)
+            page.render()
             display.flip()
