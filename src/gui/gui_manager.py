@@ -1,8 +1,9 @@
 from pygame import Rect
 
+from game.game_stats import GameStats
+from gui.game_over_gui import GameOverGui
 from gui.lives_gui import LivesGui
 from gui.score_gui import ScoreGui
-from gui.game_over_gui import GameOverGui
 
 
 class GuiManager:
@@ -14,7 +15,5 @@ class GuiManager:
     def render(self) -> None:
         self.lives.render()
         self.score.render()
-        self.game_over.render()
-
-    def update(self) -> None:
-        self.game_over.update()
+        if GameStats.get().game_over.get():
+            self.game_over.render()
