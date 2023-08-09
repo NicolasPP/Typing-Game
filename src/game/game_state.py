@@ -1,9 +1,11 @@
 from pygame import KEYDOWN
+from pygame import MOUSEBUTTONDOWN
 from pygame import K_BACKSPACE
 from pygame.event import Event
 from pygame.key import name
 
 from config.game_config import SPAWN_DELAY
+from config.game_config import BASE_LIVES_COUNT
 from game.components.board import Board
 from game.components.level import LevelManager
 from game.components.text import Text
@@ -28,7 +30,7 @@ class GameState:
         self.game_over: bool = False
         self.current_text: Text | None = None
 
-        GuiVars.lives.add_callback(self.end_game)
+        GuiVars.lives.add_callback(end_game)
 
     def render(self) -> None:
         self.board.clear()
@@ -38,7 +40,10 @@ class GameState:
         self.gui_manager.render()
 
     def update(self, delta_time: float) -> None:
-        if self.game_over: return
+        if GuiVars.game_over.get():
+            self.gui_manager.update()
+            return
+
         if self.spawn_accumulator.wait(delta_time):
             self.spawn_text()
 
@@ -57,6 +62,12 @@ class GameState:
     def parse_player_input(self, game_event: Event):
         if game_event.type == KEYDOWN:
             self.process_key_name(game_event.key)
+
+        if game_event.type == MOUSEBUTTONDOWN:
+            if self.gui_manager.game_over.is_try_again_collided:
+                GuiVars.game_over.set(False)
+                GuiVars.lives.set(BASE_LIVES_COUNT)
+                self.reset()
 
     def add_text(self, word_values: list[str]) -> None:
         text: Text = Text(word_values)
@@ -107,6 +118,10 @@ class GameState:
             current_text.update_counter_surface()
             self.level_manager.set_completed_words(self.level_manager.completed_words + 1)
 
-    def end_game(self, lives_count: int) -> None:
-        if lives_count <= 0:
-            self.game_over = True
+    def reset(self) -> None:
+        self.texts.clear()
+        self.level_manager.reset()
+
+def end_game(lives_count: int) -> None:
+    if lives_count <= 0:
+        GuiVars.game_over.set(True)
