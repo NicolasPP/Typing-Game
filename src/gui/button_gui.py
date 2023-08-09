@@ -23,7 +23,7 @@ class ButtonConfig:
     hover_alpha: int
     font_size: int
 
-
+# TODO rename to LEFT, MIDDLE, ...
 class ButtonEvent(Enum):
     MOUSECLICK_LEFT = 1
     MOUSECLICK_MIDDLE = 2
@@ -47,7 +47,7 @@ class ButtonGui:
         self.surface: Surface = self.create_surface()
         self.hover_surface: Surface = self.create_hover_surface()
         self.rect: Rect = self.surface.get_rect()
-        self.call_backs: dict[int, Callable[[], None]] = {}
+        self.call_backs: dict[int, list[Callable[[], None]]] = {}
 
     def configure(self, label_color: tuple[int, int, int] | None = None,
                   hover_color: tuple[int, int, int] | None = None, hover_alpha: int | None = None,
@@ -92,11 +92,16 @@ class ButtonGui:
         off_x, off_y = offset
         return self.rect.collidepoint(x + off_x, y + off_y)
 
-    def parse_event(self, event: Event) -> None:
+    def parse_event(self, event: Event, parent_offset: tuple[int, int]) -> None:
         if event.type != MOUSEBUTTONDOWN: return
-        func: Callable[[], None] | None = self.call_backs.get(event.button)
-        if func is None: return
-        func()
+        func_list: list[Callable[[], None]] | None = self.call_backs.get(event.button)
+        if func_list is None: return
+        if self.is_collided(parent_offset):
+            for func in func_list:
+                func()
 
     def add_call_back(self, button_event: ButtonEvent, func: Callable[[], None]) -> None:
-        self.call_backs[button_event.value] = func
+        if button_event.value not in self.call_backs:
+            self.call_backs[button_event.value] = [func]
+        else:
+            self.call_backs[button_event.value].append(func)
