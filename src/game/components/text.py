@@ -4,7 +4,7 @@ from pygame import Surface
 from pygame.font import Font
 from pygame.math import Vector2
 
-from config.game_config import WORD_COUNTER_FONT_SIZE
+from config.game_config import DEFAULT_FONT_SIZE
 from game.components.word import Word
 from utils.fonts import FontManager
 from utils.themes import Theme
@@ -20,7 +20,7 @@ class Text:
         self.score_worth: int = len(word_values)
 
     def update_counter_surface(self) -> None:
-        font: Font = FontManager.get_font(WORD_COUNTER_FONT_SIZE)
+        font: Font = FontManager.get_font(DEFAULT_FONT_SIZE // 2)
         theme: Theme = ThemeManager.get_theme()
         counter_render: Surface = font.render(str(len(self.words)), True, theme.background_primary)
         self.counter_surface = counter_render

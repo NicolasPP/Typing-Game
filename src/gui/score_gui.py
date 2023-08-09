@@ -2,7 +2,7 @@ from pygame import Rect
 from pygame import Surface
 from pygame.font import Font
 
-from config.game_config import SCORE_FONT_SIZE
+from config.game_config import DEFAULT_FONT_SIZE
 from game.game_screen import GameScreen
 from gui.gui_component import GuiComponent
 from gui.gui_vars import GuiVars
@@ -21,7 +21,7 @@ class ScoreGui(GuiComponent):
 
     def update_surface(self, value: CallbackTypes) -> None:
         assert isinstance(value, int), f"value should be {type(GuiVars.score.get())} rather than {type(value)}"
-        font: Font = FontManager.get_font(SCORE_FONT_SIZE)
+        font: Font = FontManager.get_font(DEFAULT_FONT_SIZE)
         theme: Theme = ThemeManager.get_theme()
         surface: Surface = font.render(str(value), True, theme.foreground_primary, theme.background_primary)
 
