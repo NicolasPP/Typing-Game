@@ -18,7 +18,9 @@ SPAWN_DELAY: float = 3.0  # Seconds
 STARTING_SPEED: float = 30.0
 BASE_LIVES_COUNT: int = 3
 TRY_AGAIN_VALUE: str = "Try Again!"
-
+PLAY_LABEL_VALUE: str = "Play"
+SCORE_LABEL_VALUE: str = "Scores"
+BACK_LABEL_VALUE: str = "Back"
 # -- files --
 WORDS_FILE: str = "data/words/words_alpha.txt"
 WORDS_FILE_MODE: str = "r"
