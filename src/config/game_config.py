@@ -7,6 +7,7 @@ LIFE_SURF_SIZE: int = 60
 OUTLINE_THICKNESS: int = 5
 GUI_GAP: int = 5
 GAME_OVER_ALPHA: int = 70
+HOVER_ALPHA: int = 70
 
 # -- Font --
 DEFAULT_FONT_SIZE: int = 40
