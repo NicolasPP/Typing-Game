@@ -1,7 +1,6 @@
 from random import randint
 
-from config.game_config import STARTING_SPEED
-from gui.gui_vars import GuiVars
+from game.game_stats import GameStats
 
 
 class LevelManager:
@@ -28,22 +27,7 @@ class LevelManager:
         else:
             return 4
 
-    def __init__(self) -> None:
-        self.completed_words: int = 0
-        self.speed: float = STARTING_SPEED
-
-    def set_completed_words(self, completed_words: int) -> None:
-        if completed_words < 0: return
-        self.completed_words = completed_words
-        GuiVars.score.set(completed_words)
-
-    def get_speed(self) -> float:
-        return self.speed + ((self.completed_words // 10) * 5)
-
-    def get_word_lengths(self) -> list[int]:
-        start: int = (self.completed_words // 10) + 2
+    @staticmethod
+    def roll_word_lengths() -> list[int]:
+        start: int = (GameStats.get().words_right.get() // 10) + 2
         return list(range(start, start + 3))
-
-    def reset(self) -> None:
-        self.set_completed_words(0)
-        self.speed = STARTING_SPEED

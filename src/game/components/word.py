@@ -6,6 +6,7 @@ from pygame.math import Vector2
 from config.game_config import OUTLINE_THICKNESS
 from game.components.letter import Letter
 from game.components.letter import LetterState
+from game.game_stats import GameStats
 from utils.themes import ThemeManager
 
 
@@ -68,8 +69,8 @@ class Word:
     def render(self, parent_surface: Surface) -> None:
         parent_surface.blit(self.surface, self.rect)
 
-    def fall(self, delta_time: float, speed: float) -> None:
-        distance: float = delta_time * speed
+    def fall(self, delta_time: float) -> None:
+        distance: float = delta_time * GameStats.get().fall_speed.get()
         self.set_pos(self.pos + Vector2(0, distance))
 
     def underline(self, start_index: int = 0) -> None:

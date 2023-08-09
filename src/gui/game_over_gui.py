@@ -1,14 +1,14 @@
 from pygame import Rect
 from pygame import Surface
-from pygame.font import Font
 from pygame import mouse
+from pygame.font import Font
 
 from config.game_config import DEFAULT_FONT_SIZE
 from config.game_config import GAME_OVER_ALPHA
 from config.game_config import TRY_AGAIN_VALUE
 from game.game_screen import GameScreen
+from game.game_stats import GameStats
 from gui.gui_component import GuiComponent
-from gui.gui_vars import GuiVars
 from utils.callback_vars import CallbackTypes
 from utils.fonts import FontManager
 from utils.themes import Theme
@@ -30,7 +30,7 @@ class GameOverGui(GuiComponent):
         self.try_again_rect: Rect = self.try_again.get_rect(center=self.board_rect.center)
 
     def render(self) -> None:
-        if GuiVars.game_over.get():
+        if GameStats.get().game_over.get():
             GameScreen.get_surface().blit(self.surface, self.board_rect)
             GameScreen.get_surface().blit(self.try_again, self.try_again_rect)
 

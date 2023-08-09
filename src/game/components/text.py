@@ -33,9 +33,9 @@ class Text:
         for word in self.words:
             word.set_pos(pos)
 
-    def fall(self, delta_time: float, speed: float) -> None:
+    def fall(self, delta_time: float) -> None:
         for word in self.words:
-            word.fall(delta_time, speed)
+            word.fall(delta_time)
 
     def render(self, parent_surface: Surface) -> None:
         if self.counter_surface is None: return
