@@ -3,7 +3,7 @@ from pygame import Surface
 from pygame.font import Font
 
 from config.game_config import DEFAULT_FONT_SIZE
-from game.game_screen import GameScreen
+from utils.window import Window
 from game.game_stats import GameStats
 from game.game_stats import Stats
 from gui.gui_component import GuiComponent
@@ -30,4 +30,4 @@ class ScoreGui(GuiComponent):
 
     def render(self) -> None:
         if self.surface is None or self.rect is None: return
-        GameScreen.get_surface().blit(self.surface, self.rect)
+        Window.get_surface().blit(self.surface, self.rect)

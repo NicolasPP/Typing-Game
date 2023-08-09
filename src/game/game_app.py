@@ -6,7 +6,7 @@ from pygame import event
 from pygame import font
 
 from game.components.letter import Letter
-from game.game_screen import GameScreen
+from utils.window import Window
 from gui.pages.game_page import GamePage
 from gui.pages.menu_page import MenuPage
 from gui.pages.page import Page
@@ -32,7 +32,7 @@ class GameApp:
         self.page_manager.add_page(MenuPage)
         self.page_manager.add_page(GamePage)
         self.page_manager.add_page(ScorePage)
-        self.page_manager.set_page(GamePage)
+        self.page_manager.set_page("MenuPage")
 
     def set_delta_time(self) -> None:
         now: float = time()
@@ -52,7 +52,7 @@ class GameApp:
                 else:
                     page.parse_event(game_event)
 
-            GameScreen.get().clear()
+            Window.get().clear()
             page.update(self.delta_time)
             page.render()
             display.flip()

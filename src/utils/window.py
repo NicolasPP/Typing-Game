@@ -15,19 +15,19 @@ class GameScreenConfig:
     background_color: tuple[int, int, int]
 
 
-class GameScreen:
-    screen: GameScreen | None = None
+class Window:
+    screen: Window | None = None
 
     @staticmethod
-    def get() -> GameScreen:
-        if GameScreen.screen is None:
-            GameScreen.screen = GameScreen()
+    def get() -> Window:
+        if Window.screen is None:
+            Window.screen = Window()
 
-        return GameScreen.screen
+        return Window.screen
 
     @staticmethod
     def get_surface() -> Surface:
-        return GameScreen.get().surface
+        return Window.get().surface
 
     @staticmethod
     def get_config() -> GameScreenConfig:
@@ -35,7 +35,7 @@ class GameScreen:
 
     def __init__(self) -> None:
         self.surface: Surface = display.set_mode((GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT))
-        self.config: GameScreenConfig = GameScreen.get_config()
+        self.config: GameScreenConfig = Window.get_config()
         ThemeManager.add_call_back(self.theme_call_back)
 
     def clear(self) -> None:

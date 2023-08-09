@@ -4,7 +4,7 @@ from pygame import Rect
 from pygame import Surface
 from pygame import display
 
-from game.game_screen import GameScreen
+from utils.window import Window
 from utils.themes import ThemeManager
 
 
@@ -21,7 +21,7 @@ class Board:
 
     def __init__(self, width: int, height: int) -> None:
         self.rect: Rect = Rect(0, 0, width, height)
-        self.rect.center = GameScreen.get_surface().get_rect().center
+        self.rect.center = Window.get_surface().get_rect().center
         self.config: BoardConfig = Board.get_config()
         self.surface: Surface = Surface(self.rect.size)
         self.init_board_surface()
