@@ -34,7 +34,6 @@ class LevelManager:
 
     def set_completed_words(self, completed_words: int) -> None:
         if completed_words < 0: return
-        if completed_words < self.completed_words: return
         self.completed_words = completed_words
         GuiVars.score.set(completed_words)
 
@@ -44,3 +43,7 @@ class LevelManager:
     def get_word_lengths(self) -> list[int]:
         start: int = (self.completed_words // 10) + 2
         return list(range(start, start + 3))
+
+    def reset(self) -> None:
+        self.set_completed_words(0)
+        self.speed = STARTING_SPEED
