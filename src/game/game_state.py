@@ -1,7 +1,4 @@
-from pygame import KEYDOWN
 from pygame import K_BACKSPACE
-from pygame import MOUSEBUTTONDOWN
-from pygame.event import Event
 from pygame.key import name
 
 from game.components.board import Board
@@ -9,7 +6,6 @@ from game.components.level import LevelManager
 from game.components.text import Text
 from game.game_stats import GameStats
 from game.game_stats import Stats
-from gui.gui_manager import GuiManager
 from utils.accumulator import Accumulator
 from utils.word_data_manager import WordDataManager
 
@@ -18,7 +14,6 @@ class GameState:
 
     def __init__(self, board_width: int, board_height: int) -> None:
         self.board: Board = Board(board_width, board_height)
-        self.gui_manager: GuiManager = GuiManager(self.board.rect)
         self.spawn_accumulator: Accumulator = Accumulator(GameStats.get().spawn_delay.get())
 
         self.texts: list[Text] = []
@@ -36,13 +31,10 @@ class GameState:
             for text in self.texts:
                 text.render(self.board.surface)
         self.board.render()
-        self.gui_manager.render()
 
     def update(self, delta_time: float) -> None:
         stats: Stats = GameStats.get()
-        if stats.game_over.get():
-            self.gui_manager.update()
-            return
+        if stats.game_over.get(): return
 
         if self.spawn_accumulator.wait(delta_time):
             self.spawn_text()
@@ -59,14 +51,9 @@ class GameState:
         if self.is_text_collided():
             stats.lives.set(stats.lives.get() - len(current_text.words))
 
-    def parse_player_input(self, game_event: Event):
-        if game_event.type == KEYDOWN:
-            self.process_key_name(game_event.key)
-
-        if game_event.type == MOUSEBUTTONDOWN:
-            if self.gui_manager.game_over.is_try_again_collided:
-                self.texts.clear()
-                GameStats.reset()
+    def reset(self) -> None:
+        self.texts.clear()
+        GameStats.reset()
 
     def add_text(self, word_values: list[str]) -> None:
         text: Text = Text(word_values)
