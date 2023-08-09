@@ -1,6 +1,6 @@
 import typing
 
-CallbackTypes: typing.TypeAlias = str | int | bool
+CallbackTypes: typing.TypeAlias = str | int | bool | float
 
 
 class CallBack:
@@ -45,4 +45,12 @@ class BoolCB(CallBack):
 
     def get(self) -> bool:
         assert isinstance(self.value, bool), "must be an bool"
+        return self.value
+
+class FloatCB(CallBack):
+    def __init__(self, value: float) -> None:
+        super().__init__(value)
+
+    def get(self) -> float:
+        assert isinstance(self.value, float), "must be an bool"
         return self.value
