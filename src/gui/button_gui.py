@@ -23,7 +23,6 @@ class ButtonConfig:
     hover_alpha: int
     font_size: int
 
-# TODO rename to LEFT, MIDDLE, ...
 class ButtonEvent(Enum):
     LEFT_CLICK = 1
     MIDDLE_CLICK = 2
