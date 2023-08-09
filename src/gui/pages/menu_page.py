@@ -36,8 +36,8 @@ class MenuPage(Page):
         self.gui.score.rect.midtop = self.gui.play.rect.midbottom
         self.gui.score.rect.y += self.gui.score.rect.width // 2
 
-        self.gui.play.add_call_back(ButtonEvent.MOUSECLICK_LEFT, lambda: self.change_page("GamePage"))
-        self.gui.score.add_call_back(ButtonEvent.MOUSECLICK_LEFT, lambda: self.change_page("ScorePage"))
+        self.gui.play.add_call_back(ButtonEvent.LEFT_CLICK, lambda: self.change_page("GamePage"))
+        self.gui.score.add_call_back(ButtonEvent.LEFT_CLICK, lambda: self.change_page("ScorePage"))
 
     def render(self) -> None:
         self.gui.play.render(Window.get_surface())

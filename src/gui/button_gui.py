@@ -25,11 +25,11 @@ class ButtonConfig:
 
 # TODO rename to LEFT, MIDDLE, ...
 class ButtonEvent(Enum):
-    MOUSECLICK_LEFT = 1
-    MOUSECLICK_MIDDLE = 2
-    MOUSECLICK_RIGHT = 3
-    MOUSECLICK_SCROLL_UP = 4
-    MOUSECLICK_SCROLL_DOWN = 5
+    LEFT_CLICK = 1
+    MIDDLE_CLICK = 2
+    RIGHT_CLICK = 3
+    SCROLL_UP = 4
+    SCROLL_DOWN = 5
 
 
 class ButtonGui:

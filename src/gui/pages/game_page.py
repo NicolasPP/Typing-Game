@@ -33,9 +33,9 @@ class GamePage(Page):
         super().__init__(change_page)
         self.state: GameState = GameState(BOARD_WIDTH, BOARD_HEIGHT)
         self.gui: GamePageGui = GamePage.get_gui(self.state.board.rect)
-        self.gui.game_over.retry_button.add_call_back(ButtonEvent.MOUSECLICK_LEFT, self.state.reset)
-        self.gui.game_over.back_button.add_call_back(ButtonEvent.MOUSECLICK_LEFT, self.state.reset)
-        self.gui.game_over.back_button.add_call_back(ButtonEvent.MOUSECLICK_LEFT, lambda: self.change_page("MenuPage"))
+        self.gui.game_over.retry_button.add_call_back(ButtonEvent.LEFT_CLICK, self.state.reset)
+        self.gui.game_over.back_button.add_call_back(ButtonEvent.LEFT_CLICK, self.state.reset)
+        self.gui.game_over.back_button.add_call_back(ButtonEvent.LEFT_CLICK, lambda: self.change_page("MenuPage"))
 
     def render(self) -> None:
         self.state.render()
