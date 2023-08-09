@@ -52,7 +52,6 @@ class GameState:
             self.remove_fist_text()
 
         if self.is_text_collided():
-            self.texts.clear()
             GuiVars.lives.set(GuiVars.lives.get() - len(current_text.words))
 
     def parse_player_input(self, game_event: Event):
