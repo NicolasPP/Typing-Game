@@ -7,7 +7,6 @@ from game.game_screen import GameScreen
 from game.game_stats import GameStats
 from game.game_stats import Stats
 from gui.gui_component import GuiComponent
-from utils.callback_vars import CallbackTypes
 from utils.fonts import FontManager
 from utils.themes import Theme
 from utils.themes import ThemeManager
@@ -21,12 +20,10 @@ class ScoreGui(GuiComponent):
         self.update_surface(stats.words_right.get())
         stats.words_right.add_callback(self.update_surface)
 
-    def update_surface(self, value: CallbackTypes) -> None:
-        error_message: str = f"value should be {type(GameStats.get().words_right.get())} rather than {type(value)}"
-        assert isinstance(value, int), error_message
+    def update_surface(self, score: int) -> None:
         font: Font = FontManager.get_font(DEFAULT_FONT_SIZE)
         theme: Theme = ThemeManager.get_theme()
-        surface: Surface = font.render(str(value), True, theme.foreground_primary, theme.background_primary)
+        surface: Surface = font.render(str(score), True, theme.foreground_primary, theme.background_primary)
 
         self.surface = surface
         self.rect = surface.get_rect(bottomleft=self.board_rect.topleft)

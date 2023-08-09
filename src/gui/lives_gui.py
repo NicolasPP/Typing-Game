@@ -10,7 +10,6 @@ from game.game_screen import GameScreen
 from game.game_stats import GameStats
 from game.game_stats import Stats
 from gui.gui_component import GuiComponent
-from utils.callback_vars import CallbackTypes
 from utils.themes import Theme
 from utils.themes import ThemeManager
 
@@ -45,12 +44,11 @@ class LivesGui(GuiComponent):
         self.update_surface(stats.lives.get())
         stats.lives.add_callback(self.update_surface)
 
-    def update_surface(self, value: CallbackTypes) -> None:
-        assert isinstance(value, int), f"value should be {type(GameStats.get().lives.get())} rather than {type(value)}"
-        if value < 0: value = 0
-        lives_surface: Surface = Surface((LIFE_SURF_SIZE * value, LIFE_SURF_SIZE))
+    def update_surface(self, life_count: int) -> None:
+        if life_count < 0: life_count = 0
+        lives_surface: Surface = Surface((LIFE_SURF_SIZE * life_count, LIFE_SURF_SIZE))
         prev_rect: Rect | None = None
-        for _ in range(value):
+        for _ in range(life_count):
             life_surface: Surface = LivesGui.get_life_surface()
 
             if prev_rect is None:

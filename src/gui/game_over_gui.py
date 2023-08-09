@@ -6,7 +6,6 @@ from config.game_config import TRY_AGAIN_VALUE
 from game.game_screen import GameScreen
 from gui.button_gui import ButtonGui
 from gui.gui_component import GuiComponent
-from utils.callback_vars import CallbackTypes
 from utils.themes import Theme
 from utils.themes import ThemeManager
 
@@ -26,6 +25,3 @@ class GameOverGui(GuiComponent):
     def render(self) -> None:
         self.retry_button.render(GameScreen.get_surface())
         GameScreen.get_surface().blit(self.surface, self.board_rect)
-
-    def update_surface(self, value: CallbackTypes) -> None:
-        pass
