@@ -5,9 +5,9 @@ from pygame import Rect
 from pygame import Surface
 from pygame.font import Font
 
-from config.game_config import CORRECT_COLOR
+from config.theme_config import CORRECT_COLOR
 from config.game_config import LETTER_FONT_SIZE
-from config.game_config import WRONG_COLOR
+from config.theme_config import WRONG_COLOR
 from utils.fonts import FontManager
 from utils.themes import ThemeManager
 
