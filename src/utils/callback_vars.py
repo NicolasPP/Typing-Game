@@ -30,6 +30,10 @@ class CallBack:
         if callback_func in self.callbacks: return
         self.callbacks.add(callback_func)
 
+    def increment(self, value: CallbackTypes) -> None:
+        assert isinstance(value, type(self.value)), f"expected {type(self.value).__name__}, got {type(value).__name__}"
+        self.set(self.value + value)
+
 
 class IntCB(CallBack):
     def __init__(self, value: int) -> None:
