@@ -3,6 +3,7 @@ from typing import NamedTuple
 
 from pygame.event import Event
 
+from config.game_config import GUI_GAP
 from config.game_config import PLAY_LABEL_VALUE
 from config.game_config import SCORE_LABEL_VALUE
 from gui.button_gui import ButtonEvent
@@ -31,9 +32,11 @@ class MenuPage(Page):
         theme: Theme = ThemeManager.get_theme()
         self.gui.play.configure(theme.foreground_primary)
         self.gui.score.configure(theme.foreground_primary)
-        self.gui.play.rect.center = Window.get_surface().get_rect().center
-        self.gui.score.rect.midtop = self.gui.play.rect.midbottom
-        self.gui.score.rect.y += self.gui.score.rect.width // 2
+        self.gui.play.rect.midbottom = Window.get_surface().get_rect().center
+        self.gui.score.rect.midtop = self.gui.play.rect.center
+
+        self.gui.play.rect.y -= + GUI_GAP * 10
+        self.gui.score.rect.y += + GUI_GAP * 10
 
         self.gui.play.add_call_back(ButtonEvent.LEFT_CLICK, lambda: self.change_page("GamePage"))
         self.gui.score.add_call_back(ButtonEvent.LEFT_CLICK, lambda: self.change_page("ScorePage"))

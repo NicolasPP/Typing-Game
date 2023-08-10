@@ -60,9 +60,8 @@ class LivesGui(GuiComponent):
             prev_rect = life_rect
 
         self.surface = lives_surface
-        self.rect = lives_surface.get_rect()
-        self.rect.bottomright = self.board_rect.topright
-        self.rect.y -= GUI_GAP
+        self.rect = lives_surface.get_rect(midbottom=self.board_rect.midtop)
+        self.rect.y -= (GUI_GAP * 2)
 
     def render(self) -> None:
         if self.surface is None or self.rect is None: return
