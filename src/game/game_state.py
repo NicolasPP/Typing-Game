@@ -99,6 +99,7 @@ class GameState:
             current_text.process_backspace()
         key_name: str = name(key_code)
         if len(key_name) != 1 or not key_name.isalpha(): return
+        if current_text.is_done(): return
         current_text.add_pressed_key(key_name)
         if current_text.get_current_word().is_correct():
             current_text.remove_word()
