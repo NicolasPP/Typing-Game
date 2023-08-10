@@ -20,7 +20,6 @@ class CallBack:
 
     def set_limit(self, limit: CallbackTypes) -> None:
         assert isinstance(limit, type(self.value)), f"expected {type(self.value).__name__}, got {type(limit).__name__}"
-        print(limit)
         self.limit = limit
 
     def exec_callbacks(self) -> None:
