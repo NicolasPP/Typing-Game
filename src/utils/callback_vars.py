@@ -1,12 +1,13 @@
-import typing
+from typing import Callable
+from typing import TypeAlias
 
-CallbackTypes: typing.TypeAlias = str | int | bool | float
+CallbackTypes: TypeAlias = str | int | bool | float
 
 
 class CallBack:
     def __init__(self, value: CallbackTypes) -> None:
         self.value: CallbackTypes = value
-        self.callbacks: set[typing.Callable[[CallbackTypes], None]] = set()
+        self.callbacks: set[Callable[[CallbackTypes], None]] = set()
 
     def set(self, value: CallbackTypes) -> None:
         self.value = value
@@ -16,7 +17,7 @@ class CallBack:
         for func in self.callbacks:
             func(self.value)
 
-    def add_callback(self, callback_func: typing.Callable[[CallbackTypes], None]) -> None:
+    def add_callback(self, callback_func: Callable[[CallbackTypes], None]) -> None:
         if callback_func in self.callbacks: return
         self.callbacks.add(callback_func)
 
