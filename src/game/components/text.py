@@ -48,9 +48,10 @@ class Text:
         return len(self.words) == 0
 
     def set_random_pos(self, board_width) -> None:
-        current_word: Word = self.get_current_word()
-        random_pos: Vector2 = Vector2(randrange(0, board_width - current_word.rect.width),
-                                      -1 * current_word.rect.height)
+        if self.is_done(): return
+        width: int = max([word.rect.width for word in self.words])
+        height: int = max([word.rect.height for word in self.words])
+        random_pos: Vector2 = Vector2(randrange(0, board_width - width), -1 * height)
         self.set_pos(random_pos)
 
     def underline_current_word(self) -> None:
