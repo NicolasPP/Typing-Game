@@ -23,6 +23,7 @@ class ButtonConfig:
     hover_alpha: int
     font_size: int
 
+
 class ButtonEvent(Enum):
     LEFT_CLICK = 1
     MIDDLE_CLICK = 2
@@ -91,7 +92,7 @@ class ButtonGui:
         off_x, off_y = offset
         return self.rect.collidepoint(x + off_x, y + off_y)
 
-    def parse_event(self, event: Event, parent_offset: tuple[int, int]) -> None:
+    def parse_event(self, event: Event, parent_offset: tuple[int, int] = (0, 0)) -> None:
         if event.type != MOUSEBUTTONDOWN: return
         func_list: list[Callable[[], None]] | None = self.call_backs.get(event.button)
         if func_list is None: return

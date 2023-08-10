@@ -1,7 +1,6 @@
 from typing import Callable
 from typing import NamedTuple
 
-from pygame import Rect
 from pygame.event import Event
 
 from config.game_config import PLAY_LABEL_VALUE
@@ -44,10 +43,8 @@ class MenuPage(Page):
         self.gui.score.render(Window.get_surface())
 
     def parse_event(self, event: Event) -> None:
-        window_rect: Rect = Window.get_surface().get_rect()
-        offset: tuple[int, int] = window_rect.x, window_rect.y
-        self.gui.play.parse_event(event, offset)
-        self.gui.score.parse_event(event, offset)
+        self.gui.play.parse_event(event)
+        self.gui.score.parse_event(event)
 
     def update(self, delta_time: float) -> None:
         pass

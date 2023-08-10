@@ -14,7 +14,6 @@ from gui.game_over_gui import GameOverGui
 from gui.lives_gui import LivesGui
 from gui.pages.page import Page
 from gui.score_gui import ScoreGui
-from utils.window import Window
 
 
 class GamePageGui(NamedTuple):
@@ -48,9 +47,8 @@ class GamePage(Page):
         if event.type == KEYDOWN:
             self.state.process_key_name(event.key)
 
-        window_rect: Rect = Window.get_surface().get_rect()
-        self.gui.game_over.retry_button.parse_event(event, (window_rect.x, window_rect.y))
-        self.gui.game_over.back_button.parse_event(event, (window_rect.x, window_rect.y))
+        self.gui.game_over.retry_button.parse_event(event)
+        self.gui.game_over.back_button.parse_event(event)
 
     def update(self, delta_time: float) -> None:
         self.state.update(delta_time)
