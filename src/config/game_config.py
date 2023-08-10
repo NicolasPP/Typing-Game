@@ -15,7 +15,7 @@ LETTER_FONT_SIZE: int = 33
 
 # -- Base Values --
 SPAWN_DELAY: float = 3.0  # Seconds
-STARTING_SPEED: float = 300.0
+STARTING_SPEED: float = 30.0
 BASE_LIVES_COUNT: int = 3  # max 12
 TRY_AGAIN_VALUE: str = "Try Again!"
 PLAY_LABEL_VALUE: str = "Play"
