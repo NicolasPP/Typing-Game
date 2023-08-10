@@ -18,7 +18,7 @@ class ScorePage(Page):
         self.back_button.rect.center = Window.get_surface().get_rect().center
         self.back_button.add_call_back(ButtonEvent.LEFT_CLICK, lambda: self.change_page("MenuPage"))
         theme: Theme = ThemeManager.get_theme()
-        self.back_button.configure(label_color=theme.foreground_primary, hover_color=theme.foreground_primary)
+        self.back_button.configure(label_color=theme.foreground_primary)
 
     def render(self) -> None:
         self.back_button.render(Window.get_surface())
