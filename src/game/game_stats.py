@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from config.game_config import BASE_LIVES_COUNT
+from config.game_config import BASE_LIFE_POOL
+from config.game_config import MAX_LIFE_POOL
 from config.game_config import SPAWN_DELAY
 from config.game_config import STARTING_SPEED
 from utils.callback_vars import BoolCB
@@ -34,15 +35,28 @@ class GameStats:
 
     @staticmethod
     def get_base_stats() -> Stats:
-        return Stats(IntCB(0), IntCB(0), IntCB(BASE_LIVES_COUNT), IntCB(BASE_LIVES_COUNT), FloatCB(SPAWN_DELAY),
-                     FloatCB(STARTING_SPEED), IntCB(2), IntCB(1), BoolCB(False))
+        words_right: IntCB = IntCB(0)
+        words_wrong: IntCB = IntCB(0)
+        life_pool: IntCB = IntCB(BASE_LIFE_POOL)
+        lives: IntCB = IntCB(BASE_LIFE_POOL)
+        spawn_delay: FloatCB = FloatCB(SPAWN_DELAY)
+        fall_speed: FloatCB = FloatCB(STARTING_SPEED)
+        word_length: IntCB = IntCB(2)
+        text_length: IntCB = IntCB(1)
+        game_over: BoolCB = BoolCB(False)
+
+        life_pool.set_limit(MAX_LIFE_POOL)
+        lives.set_limit(BASE_LIFE_POOL)
+        life_pool.add_callback(lambda val: lives.set_limit(val))
+        return Stats(words_right, words_wrong, life_pool, lives, spawn_delay, fall_speed, word_length, text_length,
+                     game_over)
 
     @staticmethod
     def reset() -> None:
         GameStats.get().words_right.set(0)
         GameStats.get().words_wrong.set(0)
-        GameStats.get().life_pool.set(BASE_LIVES_COUNT)
-        GameStats.get().lives.set(BASE_LIVES_COUNT)
+        GameStats.get().life_pool.set(BASE_LIFE_POOL)
+        GameStats.get().lives.set(BASE_LIFE_POOL)
         GameStats.get().spawn_delay.set(SPAWN_DELAY)
         GameStats.get().fall_speed.set(STARTING_SPEED)
         GameStats.get().word_length.set(2)
