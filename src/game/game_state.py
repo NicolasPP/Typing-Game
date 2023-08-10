@@ -49,11 +49,12 @@ class GameState:
             self.remove_fist_text()
 
         if self.is_text_collided():
-            stats.lives.set(stats.lives.get() - len(current_text.words))
+            stats.lives.increment(len(current_text.words) * -1)
+            stats.combo_fill.set(0.0)
 
     def reset(self) -> None:
         self.texts.clear()
-        GameStats.reset()
+        GameStats.reset(self.board.rect.width)
 
     def add_text(self, word_values: list[str]) -> None:
         text: Text = Text(word_values)
@@ -100,11 +101,15 @@ class GameState:
         key_name: str = name(key_code)
         if len(key_name) != 1 or not key_name.isalpha(): return
         if current_text.is_done(): return
-        current_text.add_pressed_key(key_name)
+        stats: Stats = GameStats.get()
+        combo: int = 1 if current_text.add_pressed_key(key_name) else -1
+        stats.combo_fill.increment(combo * stats.combo_multiplier.get())
         if current_text.get_current_word().is_correct():
+            word_length: int = len(current_text.get_current_word().letters)
+            stats.combo_fill.increment(float(word_length) * stats.combo_multiplier.get())
             current_text.remove_word()
             current_text.update_counter_surface()
-            GameStats.get().words_right.set(GameStats.get().words_right.get() + 1)
+            stats.words_right.increment(1)
 
     def end_game(self, lives_count: int) -> None:
         if lives_count <= 0:

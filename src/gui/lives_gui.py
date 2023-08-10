@@ -5,6 +5,7 @@ from pygame import Surface
 from pygame import draw
 
 from config.game_config import BASE_LIFE_POOL
+from config.game_config import LIFE_COMBO_HEIGHT
 from config.game_config import GUI_GAP
 from config.game_config import LIFE_SURF_SIZE
 from config.game_config import MAX_LIFE_POOL
@@ -14,6 +15,55 @@ from gui.gui_component import GuiComponent
 from utils.themes import Theme
 from utils.themes import ThemeManager
 from utils.window import Window
+
+
+class LifeCombo:
+
+    def __init__(self, board_rect: Rect) -> None:
+        self.surface: Surface = Surface((board_rect.width, LIFE_COMBO_HEIGHT))
+        self.surface.fill(ThemeManager.get_theme().foreground_primary)
+        self.rect: Rect = self.surface.get_rect(midbottom=board_rect.midtop)
+        self.rect.y -= (GUI_GAP * 2)
+        stats: Stats = GameStats.get()
+        self.full_lives: bool = stats.lives.get() == stats.life_pool.get()
+        if self.full_lives:
+            stats.combo_fill.set(float(self.rect.width))
+        else:
+            stats.combo_fill.set(0.0)
+        stats.lives.add_callback(self.update_full_lives)
+
+    def update_full_lives(self, lives: int) -> None:
+        self.full_lives = lives == GameStats.get().life_pool.get()
+
+    def render(self) -> None:
+        if GameStats.get().combo_fill.get() == 0.0: return
+        Window.get_surface().blit(self.surface, self.rect)
+
+    def set_fill_width(self, fill_width: float) -> None:
+        stats: Stats = GameStats.get()
+        if fill_width <= 0:
+            stats.combo_fill.set(0.0)
+        elif fill_width >= self.rect.width:
+            stats.combo_fill.set(float(self.rect.width))
+
+            if not self.full_lives:
+                GameStats.get().lives.increment(1)
+                stats.combo_fill.set(0.0)
+
+            if self.full_lives:
+                stats.combo_fill.set(float(self.rect.width))
+        else:
+            stats.combo_fill.set(fill_width)
+
+        self.surface = Surface((ceil(stats.combo_fill.get()), self.rect.height))
+        self.surface.fill(ThemeManager.get_theme().foreground_primary)
+
+    def update(self, delta_time: float) -> None:
+        stats: Stats = GameStats.get()
+        if stats.lives.get() == stats.life_pool.get(): return
+        self.set_fill_width(stats.combo_fill.get() - (stats.combo_speed.get() * delta_time))
+        self.surface = Surface((ceil(stats.combo_fill.get()), self.rect.height))
+        self.surface.fill(ThemeManager.get_theme().foreground_primary)
 
 
 class LivesGui(GuiComponent):
@@ -30,6 +80,7 @@ class LivesGui(GuiComponent):
     def __init__(self, board_rect: Rect) -> None:
         super().__init__(board_rect)
         stats: Stats = GameStats.get()
+        self.life_combo: LifeCombo = LifeCombo(board_rect)
         self.update_surface()
         stats.life_pool.add_callback(lambda val: self.update_surface())
         stats.lives.add_callback(lambda val: self.update_surface())
@@ -60,12 +111,16 @@ class LivesGui(GuiComponent):
             hearts_placed += 1
 
         self.surface = life_pool_surface
-        self.rect = life_pool_surface.get_rect(midbottom=self.board_rect.midtop)
+        self.rect = life_pool_surface.get_rect(midbottom=self.life_combo.rect.midtop)
         self.rect.y -= (GUI_GAP * 2)
 
     def render(self) -> None:
         if self.surface is None or self.rect is None: return
+        self.life_combo.render()
         Window.get_surface().blit(self.surface, self.rect)
+
+    def update(self, delta_time: float) -> None:
+        self.life_combo.update(delta_time)
 
 
 def draw_heart(surface: Surface, theme: Theme) -> None:
