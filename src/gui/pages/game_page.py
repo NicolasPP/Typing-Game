@@ -13,20 +13,20 @@ from gui.button_gui import ButtonEvent
 from gui.game_over_gui import GameOverGui
 from gui.lives_gui import LivesGui
 from gui.pages.page import Page
-from gui.score_gui import ScoreGui
+from gui.stats_gui import StatsGui
 
 
 class GamePageGui(NamedTuple):
     lives: LivesGui
-    score: ScoreGui
     game_over: GameOverGui
+    stats: StatsGui
 
 
 class GamePage(Page):
 
     @staticmethod
     def get_gui(board_rect: Rect) -> GamePageGui:
-        return GamePageGui(LivesGui(board_rect), ScoreGui(board_rect), GameOverGui(board_rect))
+        return GamePageGui(LivesGui(board_rect), GameOverGui(board_rect), StatsGui(board_rect))
 
     def __init__(self, change_page: Callable[[str], None]) -> None:
         super().__init__(change_page)
@@ -39,7 +39,7 @@ class GamePage(Page):
     def render(self) -> None:
         self.state.render()
         self.gui.lives.render()
-        self.gui.score.render()
+        self.gui.stats.render()
         if GameStats.get().game_over.get():
             self.gui.game_over.render()
 
