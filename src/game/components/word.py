@@ -28,15 +28,18 @@ class Word:
         self.typed_value = self.typed_value[:typed_value_size - 1]
         self.underline(len(self.typed_value))
 
-    def add_char(self, key: str) -> None:
-        if self.pressed_key_index + 1 >= len(self.letters): return
+    def add_char(self, key: str) -> bool:
+        if self.pressed_key_index + 1 >= len(self.letters): return False
         self.pressed_key_index += 1
         self.typed_value += key
-        letter: Letter = self.letters[self.pressed_key_index]
-        if key == letter.val:
+
+        result: bool =  self.letters[self.pressed_key_index].val == key
+        if result:
             self.set_letter_state(self.pressed_key_index, LetterState.RIGHT)
         else:
             self.set_letter_state(self.pressed_key_index, LetterState.WRONG)
+
+        return result
 
     def set_pos(self, pos: Vector2) -> None:
         self.rect.x, self.rect.y = round(pos.x), round(pos.y)

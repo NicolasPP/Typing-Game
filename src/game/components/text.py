@@ -60,8 +60,8 @@ class Text:
     def process_backspace(self) -> None:
         self.get_current_word().delete_char()
 
-    def add_pressed_key(self, key_name: str) -> None:
-        self.get_current_word().add_char(key_name)
+    def add_pressed_key(self, key_name: str) -> bool:
+        return self.get_current_word().add_char(key_name)
 
     def remove_word(self) -> None:
         self.words = self.words[:len(self.words) - 1]
