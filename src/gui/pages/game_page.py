@@ -47,8 +47,10 @@ class GamePage(Page):
         if event.type == KEYDOWN:
             self.state.process_key_name(event.key)
 
-        self.gui.game_over.retry_button.parse_event(event)
-        self.gui.game_over.back_button.parse_event(event)
+        if GameStats.get().game_over.get():
+            self.gui.game_over.retry_button.parse_event(event)
+            self.gui.game_over.back_button.parse_event(event)
 
     def update(self, delta_time: float) -> None:
         self.state.update(delta_time)
+        self.gui.lives.update(delta_time)
