@@ -101,6 +101,7 @@ class GameState:
         if current_text is None: return
         if key_code == K_BACKSPACE:
             current_text.process_backspace()
+            SoundManager.play(AppSounds.BACKSPACE)
         key_name: str = name(key_code)
         if len(key_name) != 1 or not key_name.isalpha(): return
         if current_text.is_done(): return
