@@ -49,7 +49,7 @@ class GameState:
         if current_text is None: return
         if current_text.is_done():
             self.remove_fist_text()
-            SoundManager.play(AppSounds.COMPLETE_TEXT)
+
         if self.is_text_collided():
             stats.lives.increment(len(current_text.words) * -1)
             stats.combo_fill.set(0.0)
@@ -121,6 +121,7 @@ class GameState:
             current_text.remove_word()
             current_text.update_counter_surface()
             stats.words_right.increment(1)
+            SoundManager.play(AppSounds.COMPLETE_TEXT)
 
     def end_game(self, lives_count: int) -> None:
         if lives_count <= 0:
