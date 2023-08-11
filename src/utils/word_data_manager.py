@@ -1,7 +1,11 @@
 from random import choice
+from typing import Type
+from typing import TypeAlias
 
 from config.game_config import WORDS_FILE
 from config.game_config import WORDS_FILE_MODE
+
+DataTypes: TypeAlias = str | float | int
 
 
 class WordDataManager:
@@ -10,15 +14,38 @@ class WordDataManager:
 
     @staticmethod
     def load_words() -> None:
-        with open(WORDS_FILE, WORDS_FILE_MODE) as word_file:
+        # https://www.wordfrequency.info/samples.asp
+        # freq_data: list[dict[str, DataTypes]] = []  # ordered by freq
+        common_words: list[str] = []
+        with open(WORDS_FILE, WORDS_FILE_MODE) as file:
+            fields: list[str] = file.readline().split()
+            row: str = file.readline()
+            while row:
 
-            for word in word_file.read().split():
-                word_length: int = len(word)
-                WordDataManager.words.append(word)
-                if word_length in WordDataManager.words_by_length:
-                    WordDataManager.words_by_length[word_length].append(word)
-                else:
-                    WordDataManager.words_by_length[word_length] = [word]
+                row_data: list[str] = row.split()
+                assert len(row_data) == len(fields)
+                # row_dict: dict[str, DataTypes] = {}
+
+                for field, data in zip(fields, row_data):
+                    # data_type: Type[DataTypes] = get_data_type(data)
+                    # row_dict[field] = data_type(data)
+                    if field == "lemma":
+                        common_words.append(data)
+                        break
+
+                # freq_data.append(row_dict)
+                row = file.readline()
+        WordDataManager.words = common_words
+        WordDataManager.process_words(common_words)
+
+    @staticmethod
+    def process_words(words: list[str]) -> None:
+        for word in words:
+            word_length: int = len(word)
+            if word_length in WordDataManager.words_by_length:
+                WordDataManager.words_by_length[word_length].append(word)
+            else:
+                WordDataManager.words_by_length[word_length] = [word]
 
     @staticmethod
     def get_random_word(word_lengths: list[int] | None = None, played_words: list[str] | None = None) -> str:
@@ -47,3 +74,13 @@ class WordDataManager:
             word = choice(possible_words)
 
         return word
+
+
+def get_data_type(data: str) -> Type[DataTypes]:
+    if data.isalnum():
+        return int
+
+    elif data.isalpha():
+        return str
+
+    return float

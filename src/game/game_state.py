@@ -105,7 +105,7 @@ class GameState:
             current_text.process_backspace()
             SoundManager.play(AppSounds.BACKSPACE)
         key_name: str = name(key_code)
-        if len(key_name) != 1 or not key_name.isalpha(): return
+        if len(key_name) != 1: return
         if current_text.is_done(): return
 
         if current_text.add_pressed_key(key_name):

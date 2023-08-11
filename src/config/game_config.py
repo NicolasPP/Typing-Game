@@ -41,5 +41,5 @@ SCORE_LABEL_VALUE: str = "Scores"
 BACK_LABEL_VALUE: str = "Back"
 
 # -- files --
-WORDS_FILE: str = "data/words/words_alpha.txt"
+WORDS_FILE: str = "data/words/words_frequency.txt"
 WORDS_FILE_MODE: str = "r"
