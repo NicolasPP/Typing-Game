@@ -8,6 +8,8 @@ from game.game_stats import GameStats
 from game.game_stats import Stats
 from utils.accumulator import Accumulator
 from utils.word_data_manager import WordDataManager
+from playsound import playsound
+
 
 
 class GameState:
@@ -47,7 +49,7 @@ class GameState:
         if current_text is None: return
         if current_text.is_done():
             self.remove_fist_text()
-
+            playsound('[YT2mp3.info] - the funny sound (128kbps).mp3')
         if self.is_text_collided():
             stats.lives.increment(len(current_text.words) * -1)
             stats.combo_fill.set(0.0)
