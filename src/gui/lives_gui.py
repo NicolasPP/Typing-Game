@@ -5,13 +5,15 @@ from pygame import Surface
 from pygame import draw
 
 from config.game_config import BASE_LIFE_POOL
-from config.game_config import LIFE_COMBO_HEIGHT
 from config.game_config import GUI_GAP
+from config.game_config import LIFE_COMBO_HEIGHT
 from config.game_config import LIFE_SURF_SIZE
 from config.game_config import MAX_LIFE_POOL
 from game.game_stats import GameStats
 from game.game_stats import Stats
 from gui.gui_component import GuiComponent
+from utils.sound_manager import AppSounds
+from utils.sound_manager import SoundManager
 from utils.themes import Theme
 from utils.themes import ThemeManager
 from utils.window import Window
@@ -48,6 +50,7 @@ class LifeCombo:
 
             if not self.full_lives:
                 GameStats.get().lives.increment(1)
+                SoundManager.play(AppSounds.GAIN_LIFE)
                 stats.combo_fill.set(0.0)
 
             if self.full_lives:

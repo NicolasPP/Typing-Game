@@ -7,9 +7,9 @@ from game.components.text import Text
 from game.game_stats import GameStats
 from game.game_stats import Stats
 from utils.accumulator import Accumulator
+from utils.sound_manager import AppSounds
+from utils.sound_manager import SoundManager
 from utils.word_data_manager import WordDataManager
-from playsound import playsound
-
 
 
 class GameState:
@@ -49,10 +49,11 @@ class GameState:
         if current_text is None: return
         if current_text.is_done():
             self.remove_fist_text()
-            playsound('[YT2mp3.info] - the funny sound (128kbps).mp3')
+            SoundManager.play(AppSounds.COMPLETE_TEXT)
         if self.is_text_collided():
             stats.lives.increment(len(current_text.words) * -1)
             stats.combo_fill.set(0.0)
+            SoundManager.play(AppSounds.LOSE_LIFE)
 
     def reset(self) -> None:
         self.texts.clear()
@@ -104,8 +105,14 @@ class GameState:
         if len(key_name) != 1 or not key_name.isalpha(): return
         if current_text.is_done(): return
         stats: Stats = GameStats.get()
-        combo: int = 1 if current_text.add_pressed_key(key_name) else -1
-        stats.combo_fill.increment(combo * stats.combo_multiplier.get())
+
+        if current_text.add_pressed_key(key_name):
+            stats.combo_fill.increment(stats.combo_multiplier.get())
+            SoundManager.play(AppSounds.ADD_CHAR_RIGHT)
+        else:
+            stats.combo_fill.increment(stats.combo_multiplier.get() * -1)
+            SoundManager.play(AppSounds.ADD_CHAR_WRONG)
+
         if current_text.get_current_word().is_correct():
             word_length: int = len(current_text.get_current_word().letters)
             stats.combo_fill.increment(float(word_length) * stats.combo_multiplier.get())

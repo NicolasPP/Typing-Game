@@ -4,25 +4,29 @@ from pygame import QUIT
 from pygame import display
 from pygame import event
 from pygame import font
+from pygame import mixer
 
 from game.components.letter import Letter
-from utils.window import Window
 from gui.pages.game_page import GamePage
 from gui.pages.menu_page import MenuPage
 from gui.pages.page import Page
 from gui.pages.page_manager import PageManager
 from gui.pages.score_page import ScorePage
+from utils.sound_manager import SoundManager
 from utils.themes import ThemeManager
+from utils.window import Window
 from utils.word_data_manager import WordDataManager
 
 
 class GameApp:
 
     def __init__(self) -> None:
+        font.init()
+        mixer.init()
         ThemeManager.load_themes()
         Letter.load_state_colors()
         WordDataManager.load_words()
-        font.init()
+        SoundManager.load_sounds()
 
         self.page_manager: PageManager = PageManager()
         self.done: bool = False

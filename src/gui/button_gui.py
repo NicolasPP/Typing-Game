@@ -12,6 +12,8 @@ from pygame.font import Font
 from config.game_config import DEFAULT_FONT_SIZE
 from config.game_config import HOVER_ALPHA
 from utils.fonts import FontManager
+from utils.sound_manager import AppSounds
+from utils.sound_manager import SoundManager
 from utils.themes import Theme
 from utils.themes import ThemeManager
 
@@ -97,6 +99,7 @@ class ButtonGui:
         func_list: list[Callable[[], None]] | None = self.call_backs.get(event.button)
         if func_list is None: return
         if self.is_collided(parent_offset):
+            SoundManager.play(AppSounds.BUTTON_CLICK)
             for func in func_list:
                 func()
 
