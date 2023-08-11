@@ -11,8 +11,6 @@ GAME_OVER_ALPHA: int = 70
 HOVER_ALPHA: int = 70
 
 # -- Sounds --
-FUNNY: str = "assets/sounds/[YT2mp3.info] - the funny sound (128kbps).mp3"
-APPLAUSE: str = "assets/sounds/applause.wav"
 BACK_BUTTON_CLICK: str = "assets/sounds/back-button-click.wav"
 BACK_BUTTON_HOVER: str = "assets/sounds/back-button-hover.wav"
 CHECK_OFF: str = "assets/sounds/check-off.wav"
