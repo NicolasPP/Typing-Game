@@ -10,6 +10,20 @@ GUI_GAP: int = 5
 GAME_OVER_ALPHA: int = 70
 HOVER_ALPHA: int = 70
 
+# -- Sounds --
+FUNNY: str = "assets/sounds/[YT2mp3.info] - the funny sound (128kbps).mp3"
+APPLAUSE: str = "assets/sounds/applause.wav"
+BACK_BUTTON_CLICK: str = "assets/sounds/back-button-click.wav"
+BACK_BUTTON_HOVER: str = "assets/sounds/back-button-hover.wav"
+CHECK_OFF: str = "assets/sounds/check-off.wav"
+CHECK_ON: str = "assets/sounds/check-on.wav"
+COMBO_BREAK: str = "assets/sounds/combobreak.wav"
+COUNT_1S: str = "assets/sounds/count1s.wav"
+COUNT_2S: str = "assets/sounds/count2s.wav"
+DRUM_HIT_CLAP: str = "assets/sounds/drum-hitclap.wav"
+DRUM_HIT_FINISH: str = "assets/sounds/drum-hitfinish.wav"
+DRUM_HIT_NORMAL: str = "assets/sounds/drum-hitnormal.wav"
+
 # -- Font --
 DEFAULT_FONT_SIZE: int = 37
 LETTER_FONT_SIZE: int = 33
