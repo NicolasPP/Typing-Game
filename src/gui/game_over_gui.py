@@ -27,11 +27,11 @@ class GameOverGui(GuiComponent):
         self.retry_button.rect.midbottom = self.board_rect.center
         self.back_button.rect.midtop = self.board_rect.center
 
-        self.back_button.rect.y +=  + (GUI_GAP * 10)
-        self.retry_button.rect.y -=  + (GUI_GAP * 10)
-
+        self.back_button.rect.y += + (GUI_GAP * 10)
+        self.retry_button.rect.y -= + (GUI_GAP * 10)
 
     def render(self) -> None:
+        if self.surface is None: return
         self.retry_button.render(Window.get_surface())
         self.back_button.render(Window.get_surface())
         Window.get_surface().blit(self.surface, self.board_rect)

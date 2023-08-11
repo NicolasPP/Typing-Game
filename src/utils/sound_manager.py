@@ -4,13 +4,13 @@ from enum import auto
 
 from pygame.mixer import Sound
 
-from config.game_config import DRUM_HIT_CLAP
 from config.game_config import BACK_BUTTON_CLICK
 from config.game_config import BACK_BUTTON_HOVER
-from config.game_config import DRUM_HIT_FINISH
-from config.game_config import COUNT_2S
-from config.game_config import DRUM_HIT_NORMAL
 from config.game_config import CHECK_ON
+from config.game_config import COUNT_2S
+from config.game_config import DRUM_HIT_CLAP
+from config.game_config import DRUM_HIT_FINISH
+from config.game_config import DRUM_HIT_NORMAL
 
 
 class AppSounds(Enum):
@@ -21,6 +21,7 @@ class AppSounds(Enum):
     LOSE_LIFE = auto()
     GAIN_LIFE = auto()
     BACKSPACE = auto()
+
 
 class SoundManager:
     sounds: dict[AppSounds, Sound] = {}
@@ -37,7 +38,7 @@ class SoundManager:
 
     @staticmethod
     def get(sound_name: AppSounds) -> Sound:
-        sound: Sound = SoundManager.sounds.get(sound_name)
+        sound: Sound | None = SoundManager.sounds.get(sound_name)
         assert sound is not None, f"sound name: {sound_name.name} has not been loaded"
         return sound
 

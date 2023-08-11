@@ -41,7 +41,7 @@ class ButtonGui:
         theme: Theme = ThemeManager.get_theme()
         return ButtonConfig(theme.background_primary, theme.background_primary, HOVER_ALPHA, DEFAULT_FONT_SIZE)
 
-    def __init__(self, label: str | None = None, size: tuple[int, int] = None) -> None:
+    def __init__(self, label: str | None = None, size: tuple[int, int] | None = None) -> None:
         assert not (label is None and size is None), "must provide label or size"
         self.label: str | None = label
         self.size: tuple[int, int] | None = size
@@ -79,6 +79,7 @@ class ButtonGui:
 
     def create_surface(self) -> Surface:
         if self.label is None:
+            assert self.size is not None, "both size and label can not be None"
             return Surface(self.size)
 
         font: Font = FontManager.get_font(self.cfg.font_size)

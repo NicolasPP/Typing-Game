@@ -37,6 +37,7 @@ class ThemeManager:
         if ThemeManager.current_theme is None:
             ThemeManager.set_current_theme(ThemeType.DARK)
 
+        assert ThemeManager.current_theme is not None
         return ThemeManager.current_theme
 
     @staticmethod

@@ -1,3 +1,4 @@
+from typing import Any
 from typing import Callable
 from typing import TypeAlias
 
@@ -7,9 +8,8 @@ CallbackTypes: TypeAlias = str | int | bool | float
 class CallBack:
     def __init__(self, value: CallbackTypes) -> None:
         self.value: CallbackTypes = value
-        self.callbacks: set[Callable[[CallbackTypes], None]] = set()
-        self.limit: CallbackTypes | None = None
-        # TODO add a way to add min and max not just max
+        self.callbacks: set[Callable[[Any], None]] = set()
+        self.limit: CallbackTypes | None = None  # TODO add a way to add min and max not just max
 
     def set(self, value: CallbackTypes) -> None:
         assert isinstance(value, type(self.value)), f"expected {type(self.value).__name__}, got {type(value).__name__}"
@@ -26,7 +26,7 @@ class CallBack:
         for func in self.callbacks:
             func(self.value)
 
-    def add_callback(self, callback_func: Callable[[CallbackTypes], None]) -> None:
+    def add_callback(self, callback_func: Callable[[Any], None]) -> None:
         if callback_func in self.callbacks: return
         self.callbacks.add(callback_func)
 

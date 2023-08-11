@@ -65,7 +65,7 @@ class StatsGui(GuiComponent):
         self.spawn_rect.y += (GUI_GAP * 2)
 
     def render(self) -> None:
-        def render_stat(surf: Surface, rect: Rect) -> None:
+        def render_stat(surf: Surface | None, rect: Rect | None) -> None:
             if surf is None or rect is None: return
             Window.get_surface().blit(surf, rect)
 
