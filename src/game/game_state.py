@@ -98,6 +98,8 @@ class GameState:
 
     def process_key_name(self, key_code: int) -> None:
         current_text: Text | None = self.get_current_text()
+        stats: Stats = GameStats.get()
+        if stats.game_over.get(): return
         if current_text is None: return
         if key_code == K_BACKSPACE:
             current_text.process_backspace()
@@ -105,7 +107,6 @@ class GameState:
         key_name: str = name(key_code)
         if len(key_name) != 1 or not key_name.isalpha(): return
         if current_text.is_done(): return
-        stats: Stats = GameStats.get()
 
         if current_text.add_pressed_key(key_name):
             stats.combo_fill.increment(stats.combo_multiplier.get())
