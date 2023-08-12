@@ -57,9 +57,6 @@ class Text:
     def underline_current_word(self) -> None:
         self.get_current_word().underline()
 
-    def process_backspace(self) -> None:
-        self.get_current_word().delete_char()
-
     def add_pressed_key(self, key_name: str) -> bool:
         return self.get_current_word().add_char(key_name)
 

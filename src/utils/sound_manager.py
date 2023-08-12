@@ -7,8 +7,6 @@ from pygame.mixer import Sound
 
 from config.game_config import ADD_CHAR_RIGHT_VOLUME_MULT
 from config.game_config import ADD_CHAR_WRONG_VOLUME_MULT
-from config.game_config import BACKSPACE_VOLUME_MULT
-from config.game_config import BACK_BUTTON_CLICK
 from config.game_config import BACK_BUTTON_HOVER
 from config.game_config import BUTTON_CLICK_VOLUME_MULT
 from config.game_config import CHECK_ON
@@ -29,7 +27,6 @@ class AppSounds(Enum):
     BUTTON_CLICK = auto()
     LOSE_LIFE = auto()
     GAIN_LIFE = auto()
-    BACKSPACE = auto()
 
 
 class AppSound(NamedTuple):
@@ -49,7 +46,6 @@ class SoundManager:
         SoundManager.sounds[AppSounds.BUTTON_CLICK] = AppSound(Sound(BACK_BUTTON_HOVER), BUTTON_CLICK_VOLUME_MULT)
         SoundManager.sounds[AppSounds.LOSE_LIFE] = AppSound(Sound(COUNT_2S), LOSE_LIFE_VOLUME_MULT)
         SoundManager.sounds[AppSounds.GAIN_LIFE] = AppSound(Sound(CHECK_ON), GAIN_LIFE_VOLUME_MULT)
-        SoundManager.sounds[AppSounds.BACKSPACE] = AppSound(Sound(BACK_BUTTON_CLICK), BACKSPACE_VOLUME_MULT)
 
     @staticmethod
     def set_volume(volume: float) -> None:

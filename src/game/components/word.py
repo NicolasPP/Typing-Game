@@ -17,25 +17,15 @@ class Word:
         self.surface: Surface = self.create_surface()
         self.rect: Rect = Rect(0, 0, *self.surface.get_size())
         self.pos: Vector2 = Vector2(0, 0)
-        self.pressed_key_index: int = -1
-
-    def delete_char(self) -> None:
-        if self.pressed_key_index == -1: return
-        self.set_letter_state(self.pressed_key_index, LetterState.EMPTY)
-        self.pressed_key_index -= 1
-        typed_value_size: int = len(self.typed_value)
-        if typed_value_size == 0: return
-        self.typed_value = self.typed_value[:typed_value_size - 1]
-        self.underline(len(self.typed_value))
+        self.pressed_key_index: int = 0
 
     def add_char(self, key: str) -> bool:
-        if self.pressed_key_index + 1 >= len(self.letters): return False
-        self.pressed_key_index += 1
-        self.typed_value += key
-
+        if self.pressed_key_index >= len(self.letters): return False
         result: bool = self.letters[self.pressed_key_index].val == key
         if result:
             self.set_letter_state(self.pressed_key_index, LetterState.RIGHT)
+            self.pressed_key_index += 1
+            self.typed_value += key
         else:
             self.set_letter_state(self.pressed_key_index, LetterState.WRONG)
 

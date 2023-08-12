@@ -46,7 +46,6 @@ COMPLETE_TEXT_VOLUME_MULT: float = 1.0
 BUTTON_CLICK_VOLUME_MULT: float = 1.0
 LOSE_LIFE_VOLUME_MULT: float = 1.0
 GAIN_LIFE_VOLUME_MULT: float = 1.0
-BACKSPACE_VOLUME_MULT: float = 1.0
 
 # -- files --
 WORDS_FILE: str = "data/words/words_frequency.txt"

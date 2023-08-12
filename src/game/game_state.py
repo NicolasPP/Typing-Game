@@ -1,4 +1,3 @@
-from pygame import K_BACKSPACE
 from pygame.key import name
 
 from game.components.board import Board
@@ -101,13 +100,9 @@ class GameState:
         stats: Stats = GameStats.get()
         if stats.game_over.get(): return
         if current_text is None: return
-        if key_code == K_BACKSPACE:
-            current_text.process_backspace()
-            SoundManager.play(AppSounds.BACKSPACE)
         key_name: str = name(key_code)
         if len(key_name) != 1: return
         if current_text.is_done(): return
-
         if current_text.add_pressed_key(key_name):
             stats.combo_fill.increment(stats.combo_multiplier.get())
             SoundManager.play(AppSounds.ADD_CHAR_RIGHT)
