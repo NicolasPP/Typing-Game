@@ -6,7 +6,7 @@ from config.game_config import BASE_LIFE_POOL
 from config.game_config import BASE_LIVES_COUNT
 from config.game_config import MAX_LIFE_POOL
 from config.game_config import SPAWN_DELAY
-from config.game_config import STARTING_SPEED
+from config.game_config import BASE_SPEED
 from config.game_config import BASE_COMBO_SPEED
 from config.game_config import BASE_COMBO_MULTIPLIER
 from config.game_config import MAX_COMBO_MULTIPLIER
@@ -47,7 +47,7 @@ class GameStats:
         life_pool: IntCB = IntCB(BASE_LIFE_POOL)
         lives: IntCB = IntCB(BASE_LIVES_COUNT)
         spawn_delay: FloatCB = FloatCB(SPAWN_DELAY)
-        fall_speed: FloatCB = FloatCB(STARTING_SPEED)
+        fall_speed: FloatCB = FloatCB(BASE_SPEED)
         word_length: IntCB = IntCB(2)
         text_length: IntCB = IntCB(1)
         game_over: BoolCB = BoolCB(False)
@@ -69,7 +69,7 @@ class GameStats:
         GameStats.get().life_pool.set(BASE_LIFE_POOL)
         GameStats.get().lives.set(BASE_LIVES_COUNT)
         GameStats.get().spawn_delay.set(SPAWN_DELAY)
-        GameStats.get().fall_speed.set(STARTING_SPEED)
+        GameStats.get().fall_speed.set(BASE_SPEED)
         GameStats.get().word_length.set(2)
         GameStats.get().text_length.set(1)
         GameStats.get().game_over.set(False)

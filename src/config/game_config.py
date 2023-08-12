@@ -28,7 +28,7 @@ LETTER_FONT_SIZE: int = 33
 
 # -- Base Values --
 SPAWN_DELAY: float = 3.0  # Seconds
-STARTING_SPEED: float = 30.0
+BASE_SPEED: float = 30.0
 BASE_COMBO_SPEED: float = 20.0
 BASE_COMBO_MULTIPLIER: float = 7.0
 MAX_COMBO_MULTIPLIER: float = 15.0
