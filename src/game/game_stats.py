@@ -55,10 +55,10 @@ class GameStats:
         combo_fill: FloatCB = FloatCB(0.0)
         combo_multiplier: FloatCB = FloatCB(BASE_COMBO_MULTIPLIER)
 
-        life_pool.set_limit(MAX_LIFE_POOL)
-        combo_multiplier.set_limit(MAX_COMBO_MULTIPLIER)
-        lives.set_limit(BASE_LIFE_POOL)
-        life_pool.add_callback(lambda val: lives.set_limit(val))
+        life_pool.set_limit(BASE_LIFE_POOL, MAX_LIFE_POOL)
+        combo_multiplier.set_limit(BASE_COMBO_MULTIPLIER, MAX_COMBO_MULTIPLIER)
+        lives.set_limit(0, BASE_LIFE_POOL)
+        life_pool.add_callback(lambda val: lives.set_limit(0, val))
         return Stats(words_right, words_wrong, life_pool, lives, spawn_delay, fall_speed, word_length, text_length,
                      game_over, combo_speed, combo_fill, combo_multiplier)
 

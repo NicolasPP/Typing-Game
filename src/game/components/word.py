@@ -33,7 +33,7 @@ class Word:
         self.pressed_key_index += 1
         self.typed_value += key
 
-        result: bool =  self.letters[self.pressed_key_index].val == key
+        result: bool = self.letters[self.pressed_key_index].val == key
         if result:
             self.set_letter_state(self.pressed_key_index, LetterState.RIGHT)
         else:

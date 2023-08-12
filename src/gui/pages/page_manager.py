@@ -9,7 +9,6 @@ class PageManager:
         self.pages: dict[str, Page] = {}
         self.current_page: str | None = None
 
-
     def add_page(self, page: Type[Page]) -> None:
         self.pages[page.__name__] = page(self.set_page)
 

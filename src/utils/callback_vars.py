@@ -9,18 +9,11 @@ class CallBack:
     def __init__(self, value: CallbackTypes) -> None:
         self.value: CallbackTypes = value
         self.callbacks: set[Callable[[Any], None]] = set()
-        self.limit: CallbackTypes | None = None  # TODO add a way to add min and max not just max
 
-    def set(self, value: CallbackTypes) -> None:
+    def set(self, value: Any) -> None:
         assert isinstance(value, type(self.value)), f"expected {type(self.value).__name__}, got {type(value).__name__}"
-        if self.limit is not None:
-            if value > self.limit: return
         self.value = value
         self.exec_callbacks()
-
-    def set_limit(self, limit: CallbackTypes) -> None:
-        assert isinstance(limit, type(self.value)), f"expected {type(self.value).__name__}, got {type(limit).__name__}"
-        self.limit = limit
 
     def exec_callbacks(self) -> None:
         for func in self.callbacks:
@@ -30,14 +23,29 @@ class CallBack:
         if callback_func in self.callbacks: return
         self.callbacks.add(callback_func)
 
-    def increment(self, value: CallbackTypes) -> None:
-        assert isinstance(value, type(self.value)), f"expected {type(self.value).__name__}, got {type(value).__name__}"
-        self.set(self.value + value)
-
 
 class IntCB(CallBack):
     def __init__(self, value: int) -> None:
         super().__init__(value)
+        self.limit_min: int | None = None
+        self.limit_max: int | None = None
+
+    def set(self, value: int) -> None:
+
+        if self.limit_max is not None:
+            if value > self.limit_max: return
+
+        if self.limit_min is not None:
+            if value < self.limit_min: return
+
+        super().set(value)
+
+    def set_limit(self, limit_min: int | None, limit_max: int | None) -> None:
+        self.limit_min = limit_min
+        self.limit_max = limit_max
+
+    def increment(self, value: int) -> None:
+        self.set(self.get() + value)
 
     def get(self) -> int:
         assert isinstance(self.value, int), "must be an int"
@@ -65,6 +73,25 @@ class BoolCB(CallBack):
 class FloatCB(CallBack):
     def __init__(self, value: float) -> None:
         super().__init__(value)
+        self.limit_min: float | None = None
+        self.limit_max: float | None = None
+
+    def set(self, value: float) -> None:
+
+        if self.limit_max is not None:
+            if value > self.limit_max: return
+
+        if self.limit_min is not None:
+            if value < self.limit_min: return
+
+        super().set(value)
+
+    def set_limit(self, limit_min: float | None, limit_max: float | None) -> None:
+        self.limit_min = limit_min
+        self.limit_max = limit_max
+
+    def increment(self, value: float) -> None:
+        self.set(self.get() + value)
 
     def get(self) -> float:
         assert isinstance(self.value, float), "must be a float"
