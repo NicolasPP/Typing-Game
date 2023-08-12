@@ -11,6 +11,7 @@ from config.game_config import COUNT_2S
 from config.game_config import DRUM_HIT_CLAP
 from config.game_config import DRUM_HIT_FINISH
 from config.game_config import DRUM_HIT_NORMAL
+from config.game_config import DEFAULT_VOLUME
 
 
 class AppSounds(Enum):
@@ -25,6 +26,7 @@ class AppSounds(Enum):
 
 class SoundManager:
     sounds: dict[AppSounds, Sound] = {}
+    volume: float = DEFAULT_VOLUME
 
     @staticmethod
     def load_sounds() -> None:
@@ -37,6 +39,10 @@ class SoundManager:
         SoundManager.sounds[AppSounds.BACKSPACE] = Sound(BACK_BUTTON_CLICK)
 
     @staticmethod
+    def set_volume(volume: float) -> None:
+        SoundManager.volume = volume
+
+    @staticmethod
     def get(sound_name: AppSounds) -> Sound:
         sound: Sound | None = SoundManager.sounds.get(sound_name)
         assert sound is not None, f"sound name: {sound_name.name} has not been loaded"
@@ -45,4 +51,5 @@ class SoundManager:
     @staticmethod
     def play(sound_name: AppSounds) -> None:
         sound: Sound = SoundManager.get(sound_name)
+        sound.set_volume(SoundManager.volume)
         start_new_thread(sound.play, ())

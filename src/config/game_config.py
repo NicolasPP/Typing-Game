@@ -35,6 +35,7 @@ MAX_COMBO_MULTIPLIER: float = 15.0
 BASE_LIVES_COUNT: int = 3
 BASE_LIFE_POOL: int = 3
 MAX_LIFE_POOL: int = 12
+DEFAULT_VOLUME: float = 0.3
 TRY_AGAIN_VALUE: str = "Try Again!"
 PLAY_LABEL_VALUE: str = "Play"
 SCORE_LABEL_VALUE: str = "Scores"
