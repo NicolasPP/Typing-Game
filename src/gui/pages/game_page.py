@@ -45,7 +45,7 @@ class GamePage(Page):
 
     def parse_event(self, event: Event) -> None:
         if event.type == KEYDOWN:
-            self.state.process_key_name(event.key)
+            self.state.process_key_code(event.key)
 
         if GameStats.get().game_over.get():
             self.gui.game_over.retry_button.parse_event(event)

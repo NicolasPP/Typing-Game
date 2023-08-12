@@ -95,7 +95,7 @@ class GameState:
         if len(self.texts) == 0: return None
         return self.texts[0]
 
-    def process_key_name(self, key_code: int) -> None:
+    def process_key_code(self, key_code: int) -> None:
         current_text: Text | None = self.get_current_text()
         stats: Stats = GameStats.get()
         if stats.game_over.get(): return
