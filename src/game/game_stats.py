@@ -57,8 +57,8 @@ class GameStats:
 
         life_pool.set_limit(BASE_LIFE_POOL, MAX_LIFE_POOL)
         combo_multiplier.set_limit(BASE_COMBO_MULTIPLIER, MAX_COMBO_MULTIPLIER)
-        lives.set_limit(0, BASE_LIFE_POOL)
-        life_pool.add_callback(lambda val: lives.set_limit(0, val))
+        lives.set_limit(None, BASE_LIFE_POOL)
+        life_pool.add_callback(lambda val: lives.set_limit(None, val))
         return Stats(words_right, words_wrong, life_pool, lives, spawn_delay, fall_speed, word_length, text_length,
                      game_over, combo_speed, combo_fill, combo_multiplier)
 
