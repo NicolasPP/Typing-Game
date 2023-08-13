@@ -23,7 +23,7 @@ from config.game_config import LOSE_LIFE_VOLUME_MULT
 class AppSounds(Enum):
     ADD_CHAR_RIGHT = auto()
     ADD_CHAR_WRONG = auto()
-    COMPLETE_TEXT = auto()
+    COMPLETE_WORD = auto()
     BUTTON_CLICK = auto()
     LOSE_LIFE = auto()
     GAIN_LIFE = auto()
@@ -42,7 +42,7 @@ class SoundManager:
     def load_sounds() -> None:
         SoundManager.sounds[AppSounds.ADD_CHAR_RIGHT] = AppSound(Sound(DRUM_HIT_NORMAL), ADD_CHAR_RIGHT_VOLUME_MULT)
         SoundManager.sounds[AppSounds.ADD_CHAR_WRONG] = AppSound(Sound(DRUM_HIT_FINISH), ADD_CHAR_WRONG_VOLUME_MULT)
-        SoundManager.sounds[AppSounds.COMPLETE_TEXT] = AppSound(Sound(DRUM_HIT_CLAP), COMPLETE_TEXT_VOLUME_MULT)
+        SoundManager.sounds[AppSounds.COMPLETE_WORD] = AppSound(Sound(DRUM_HIT_CLAP), COMPLETE_TEXT_VOLUME_MULT)
         SoundManager.sounds[AppSounds.BUTTON_CLICK] = AppSound(Sound(BACK_BUTTON_HOVER), BUTTON_CLICK_VOLUME_MULT)
         SoundManager.sounds[AppSounds.LOSE_LIFE] = AppSound(Sound(COUNT_2S), LOSE_LIFE_VOLUME_MULT)
         SoundManager.sounds[AppSounds.GAIN_LIFE] = AppSound(Sound(CHECK_ON), GAIN_LIFE_VOLUME_MULT)

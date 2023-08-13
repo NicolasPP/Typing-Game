@@ -116,7 +116,7 @@ class GameState:
             current_text.remove_word()
             current_text.update_counter_surface()
             stats.words_right.increment(1)
-            SoundManager.play(AppSounds.COMPLETE_TEXT)
+            SoundManager.play(AppSounds.COMPLETE_WORD)
 
     def end_game(self, lives_count: int) -> None:
         if lives_count <= 0:
