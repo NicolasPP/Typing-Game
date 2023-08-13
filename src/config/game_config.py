@@ -9,6 +9,7 @@ LIFE_COMBO_HEIGHT: int = 3
 GUI_GAP: int = 5
 GAME_OVER_ALPHA: int = 70
 HOVER_ALPHA: int = 70
+REQUIRED_WORDS_ALPHA: int = 50
 
 # -- Sounds --
 BACK_BUTTON_CLICK: str = "assets/sounds/back-button-click.wav"
@@ -36,6 +37,9 @@ BASE_LIVES_COUNT: int = 3
 BASE_LIFE_POOL: int = 3
 MAX_LIFE_POOL: int = 12
 DEFAULT_VOLUME: float = 0.3
+BASE_WORD_LENGTH: int = 1
+BASE_TEXT_LENGTH: int = 1
+MAX_TEXT_LENGTH: int = 5
 TRY_AGAIN_VALUE: str = "Try Again!"
 PLAY_LABEL_VALUE: str = "Play"
 SCORE_LABEL_VALUE: str = "Scores"
@@ -46,6 +50,7 @@ COMPLETE_TEXT_VOLUME_MULT: float = 1.0
 BUTTON_CLICK_VOLUME_MULT: float = 1.0
 LOSE_LIFE_VOLUME_MULT: float = 1.0
 GAIN_LIFE_VOLUME_MULT: float = 1.0
+BASE_WORDS_PER_LEVEL: int = 20
 
 # -- files --
 WORDS_FILE: str = "data/words/words_frequency.txt"

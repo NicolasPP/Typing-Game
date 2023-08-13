@@ -8,7 +8,6 @@ from game.game_stats import Stats
 from utils.accumulator import Accumulator
 from utils.sound_manager import AppSounds
 from utils.sound_manager import SoundManager
-from utils.word_data_manager import WordDataManager
 
 
 class GameState:
@@ -16,10 +15,9 @@ class GameState:
     def __init__(self, board_width: int, board_height: int) -> None:
         self.board: Board = Board(board_width, board_height)
         self.spawn_accumulator: Accumulator = Accumulator(GameStats.get().spawn_delay.get())
+        self.level_manager: LevelManager = LevelManager()
 
         self.texts: list[Text] = []
-        self.played_words: list[str] = []
-
         self.stop_spawning: bool = False
         self.game_over: bool = False
         self.current_text: Text | None = None
@@ -58,25 +56,15 @@ class GameState:
         self.texts.clear()
         GameStats.reset(self.board.rect.width)
 
-    def add_text(self, word_values: list[str]) -> None:
-        text: Text = Text(word_values)
+    def add_text(self, text: Text) -> None:
         text.set_random_pos(self.board.rect.width)
         if len(self.texts) == 0: text.underline_current_word()
         self.texts.append(text)
 
     def spawn_text(self) -> None:
         if self.stop_spawning: return
-        word_values: list[str] = []
-
-        text_length: int = LevelManager.roll_text_length()
-        word_lengths: list[int] = LevelManager.roll_word_lengths()
-
-        while len(word_values) < text_length:
-            word_val: str = WordDataManager.get_random_word(played_words=self.played_words, word_lengths=word_lengths)
-            word_values.append(word_val)
-            self.played_words.append(word_val)
-
-        self.add_text(word_values)
+        text: Text = self.level_manager.get_text()
+        self.add_text(text)
 
     def remove_fist_text(self) -> None:
         self.texts = self.texts[1:]
@@ -115,7 +103,7 @@ class GameState:
             stats.combo_fill.increment(float(word_length) * stats.combo_multiplier.get())
             current_text.remove_word()
             current_text.update_counter_surface()
-            stats.words_right.increment(1)
+            stats.words_required.increment(-1)
             SoundManager.play(AppSounds.COMPLETE_WORD)
 
     def end_game(self, lives_count: int) -> None:
