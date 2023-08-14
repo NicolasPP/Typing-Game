@@ -15,7 +15,7 @@ class GameState:
     def __init__(self, board_width: int, board_height: int) -> None:
         self.board: Board = Board(board_width, board_height)
         self.spawn_accumulator: Accumulator = Accumulator(GameStats.get().spawn_delay.get())
-        self.level_manager: LevelManager = LevelManager()
+        self.level_manager: LevelManager = LevelManager(self.board.rect)
 
         self.texts: list[Text] = []
         self.stop_spawning: bool = False
@@ -26,16 +26,21 @@ class GameState:
 
     def render(self) -> None:
         self.board.clear()
-        if not GameStats.get().game_over.get():
-            for text in self.texts:
-                text.render(self.board.surface)
+        for text in self.texts:
+            text.render(self.board.surface)
+        self.level_manager.render(self.board.surface)
         self.board.render()
 
     def update(self, delta_time: float) -> None:
         stats: Stats = GameStats.get()
         if stats.game_over.get(): return
+        is_rolling: bool = self.level_manager.is_rolling
+        self.level_manager.update(delta_time)
 
-        if self.spawn_accumulator.wait(delta_time):
+        if is_rolling and len(self.texts) > 0:
+            self.texts.clear()
+
+        if self.spawn_accumulator.wait(delta_time) and not is_rolling:
             self.spawn_text()
 
         # update words
@@ -54,6 +59,7 @@ class GameState:
 
     def reset(self) -> None:
         self.texts.clear()
+        self.level_manager.words_req.render = True
         GameStats.reset(self.board.rect.width)
 
     def add_text(self, text: Text) -> None:
@@ -109,4 +115,5 @@ class GameState:
     def end_game(self, lives_count: int) -> None:
         if lives_count <= 0:
             GameStats.get().game_over.set(True)
-            self.board.clear()
+            self.texts.clear()
+            self.level_manager.words_req.render = False
