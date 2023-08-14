@@ -54,6 +54,10 @@ class LevelManager:
         self.update_word_req(GameStats.get().words_required.get())
         GameStats.get().words_required.add_callback(self.update_word_req)
 
+    def reset(self) -> None:
+        self.words_req.render = True
+        self.words_per_level = BASE_WORDS_PER_LEVEL
+
     def update_word_req(self, words_req: int) -> None:
         if words_req == 0: self.set_is_rolling(True)
         font: Font = FontManager.get_font(DEFAULT_FONT_SIZE * 6)

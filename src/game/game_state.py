@@ -59,7 +59,7 @@ class GameState:
 
     def reset(self) -> None:
         self.texts.clear()
-        self.level_manager.words_req.render = True
+        self.level_manager.reset()
         GameStats.reset(self.board.rect.width)
 
     def add_text(self, text: Text) -> None:
