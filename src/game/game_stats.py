@@ -19,6 +19,7 @@ from utils.callback_vars import FloatCB
 from utils.callback_vars import IntCB
 from utils.word_data_manager import WordDataManager
 
+
 @dataclass
 class Stats:
     level_num: IntCB
