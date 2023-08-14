@@ -111,12 +111,12 @@ class GameModifier:
     @staticmethod
     def load_buffs() -> None:
         stats: Stats = GameStats.get()
-        increase_life_pool: FixedModifier = FixedModifier(stats.life_pool, "LifePool+", "Increase life pool by 1",
+        increase_life_pool: FixedModifier = FixedModifier(stats.life_pool, "LifePool+", "Increase life pool",
                                                           StatModifierType.INCREASE, 1)
         decrease_fall_speed: MultiplierModifier = MultiplierModifier(stats.fall_speed, "FallSpeed-",
                                                                      "increase fall speed", StatModifierType.DECREASE)
-        increase_spawn_delay: MultiplierModifier = MultiplierModifier(stats.spawn_delay, "SpawnDelay-",
-                                                                      "decrease the spawn delay",
+        increase_spawn_delay: MultiplierModifier = MultiplierModifier(stats.spawn_delay, "SpawnDelay+",
+                                                                      "increase the spawn delay",
                                                                       StatModifierType.INCREASE)
         GameModifier.buffs.extend([increase_life_pool, decrease_fall_speed, increase_spawn_delay])
 
