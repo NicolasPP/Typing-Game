@@ -10,6 +10,8 @@ from config.game_config import MAX_STAT_MULT
 from config.game_config import MIN_STAT_MULT
 from config.game_config import STAT_MOD_AMOUNT
 from config.game_config import STAT_MULT_SEG_SIZE
+from config.game_config import BASE_WORDS_PER_LEVEL
+from config.game_config import MAX_MODIFIER_LEVEL
 from game.game_stats import GameStats
 from game.game_stats import Stats
 from utils.callback_vars import BoolCB
@@ -53,6 +55,14 @@ class MultiplierModifier(StatModifier):
 
         else:
             self.start_point = starting_point
+
+    def update_starting_point(self, nerf: float | None = None) -> None:
+        progress_mult: float = get_words_completed() / get_words_completed(MAX_MODIFIER_LEVEL)
+        progress: float = (self.max_mult - self.min_mult) * progress_mult
+        if nerf is None:
+            self.set_starting_point(self.min_mult + progress)
+        else:
+            self.set_starting_point(self.min_mult + (progress * nerf))
 
     def roll_multiplier(self) -> float:
         return uniform(self.start_point, self.start_point + self.seg_size)
@@ -105,12 +115,16 @@ class GameModifier:
         decrease_spawn_delay: MultiplierModifier = MultiplierModifier(stats.spawn_delay, "SpawnDelay-",
                                                                       "decrease the spawn delay",
                                                                       StatModifierType.DECREASE)
+        for mult_mod in [decrease_spawn_delay, increase_fall_speed]:
+            stats.level_num.add_callback(lambda val: mult_mod.update_starting_point())
         GameModifier.debuffs.extend(
             [increase_text_length, increase_word_length, increase_fall_speed, decrease_spawn_delay])
 
     @staticmethod
     def load_buffs() -> None:
         stats: Stats = GameStats.get()
+        increase_life_combo: FixedModifier = FixedModifier(stats.combo_multiplier, "LifeCombo+", "Gain extra life quicker",
+                                                           StatModifierType.INCREASE, 2)
         increase_life_pool: FixedModifier = FixedModifier(stats.life_pool, "LifePool+", "Increase life pool",
                                                           StatModifierType.INCREASE, 1)
         decrease_fall_speed: MultiplierModifier = MultiplierModifier(stats.fall_speed, "FallSpeed-",
@@ -118,7 +132,9 @@ class GameModifier:
         increase_spawn_delay: MultiplierModifier = MultiplierModifier(stats.spawn_delay, "SpawnDelay+",
                                                                       "increase the spawn delay",
                                                                       StatModifierType.INCREASE)
-        GameModifier.buffs.extend([increase_life_pool, decrease_fall_speed, increase_spawn_delay])
+        for mult_mod in [decrease_fall_speed, increase_spawn_delay]:
+            stats.level_num.add_callback(lambda val: mult_mod.update_starting_point(nerf=0.5))
+        GameModifier.buffs.extend([increase_life_combo, increase_life_pool, decrease_fall_speed, increase_spawn_delay])
 
     @staticmethod
     def roll_buffs() -> list[StatModifier]:
@@ -137,3 +153,10 @@ class GameModifier:
             if debuff not in debuffs:
                 debuffs.append(debuff)
         return debuffs
+
+
+def get_words_completed(level: int | None = None) -> int:
+    if level is None:
+        level: int = GameStats.get().level_num.get()
+    words_req: int = GameStats.get().words_required.get()
+    return int(BASE_WORDS_PER_LEVEL * ((level * (level + 1)) / 2)) + words_req
