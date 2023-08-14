@@ -11,7 +11,6 @@ from game.game_state import GameState
 from game.game_stats import GameStats
 from gui.button_gui import ButtonEvent
 from gui.game_over_gui import GameOverGui
-from gui.level_gui import LevelGui
 from gui.lives_gui import LivesGui
 from gui.pages.page import Page
 from gui.stats_gui import StatsGui
@@ -21,14 +20,13 @@ class GamePageGui(NamedTuple):
     lives: LivesGui
     game_over: GameOverGui
     stats: StatsGui
-    level: LevelGui
 
 
 class GamePage(Page):
 
     @staticmethod
     def get_gui(board_rect: Rect) -> GamePageGui:
-        return GamePageGui(LivesGui(board_rect), GameOverGui(board_rect), StatsGui(board_rect), LevelGui(board_rect))
+        return GamePageGui(LivesGui(board_rect), GameOverGui(board_rect), StatsGui(board_rect))
 
     def __init__(self, change_page: Callable[[str], None]) -> None:
         super().__init__(change_page)
@@ -40,7 +38,6 @@ class GamePage(Page):
 
     def render(self) -> None:
         self.state.render()
-        self.gui.level.render()
         self.gui.lives.render()
         self.gui.stats.render()
         if GameStats.get().game_over.get():
