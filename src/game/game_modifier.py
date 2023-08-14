@@ -20,5 +20,4 @@ def roll_text_length() -> int:
     choices: list[int] = []
     for length, freq in zip(possible_lengths, possible_lengths[::-1]):
         choices.extend([length] * freq)
-    print(choices)
     return choice(choices)
