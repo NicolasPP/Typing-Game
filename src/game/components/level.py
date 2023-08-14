@@ -69,7 +69,6 @@ class LevelManager:
             self.state = LevelState.HIDE_REQ_NUM
         else:
             GameStats.get().level_num.increment(1)
-            GameStats.get().words_required.set(self.words_per_level)
         self.is_rolling = is_rolling
 
     def get_text(self) -> Text:
@@ -92,6 +91,7 @@ class LevelManager:
             if is_fade_done:
                 self.state = LevelState.SHOW_ROLL
                 self.words_req.render = False
+                self.words_per_level += BASE_WORDS_PER_LEVEL
                 GameStats.get().words_required.set(self.words_per_level)
 
         elif self.state is LevelState.SHOW_REQ_NUM:
@@ -109,7 +109,7 @@ class LevelManager:
             for debuff in debuffs:
                 debuff.apply()
 
-            print("debuffs: ")
+            print("debuffs: ", end=' ')
             print(*[d.name for d in debuffs], sep=' ')
 
             self.state = LevelState.HIDE_ROLL
