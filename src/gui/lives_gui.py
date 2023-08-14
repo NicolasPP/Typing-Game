@@ -28,11 +28,15 @@ class LifeCombo:
         self.rect.y -= (GUI_GAP * 2)
         stats: Stats = GameStats.get()
         self.full_lives: bool = stats.lives.get() == stats.life_pool.get()
+        stats.life_pool.add_callback(lambda val: self.update_fill_width())
         if self.full_lives:
             stats.combo_fill.set(float(self.rect.width))
         else:
             stats.combo_fill.set(0.0)
         stats.lives.add_callback(self.update_full_lives)
+
+    def update_fill_width(self) -> None:
+        self.set_fill_width(0)
 
     def update_full_lives(self, lives: int) -> None:
         self.full_lives = lives == GameStats.get().life_pool.get()
