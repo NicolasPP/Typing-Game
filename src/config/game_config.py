@@ -29,9 +29,9 @@ LETTER_FONT_SIZE: int = 33
 
 # -- Base Values --
 SPAWN_DELAY: float = 3.0  # Seconds
-BASE_SPEED: float = 30.0
+BASE_SPEED: float = 35.0
 BASE_COMBO_SPEED: float = 20.0
-BASE_COMBO_MULTIPLIER: float = 7.0
+BASE_COMBO_MULTIPLIER: float = 8.0
 MAX_COMBO_MULTIPLIER: float = 15.0
 BASE_LIVES_COUNT: int = 3
 BASE_LIFE_POOL: int = 3
@@ -52,8 +52,8 @@ LOSE_LIFE_VOLUME_MULT: float = 1.0
 GAIN_LIFE_VOLUME_MULT: float = 1.0
 BASE_WORDS_PER_LEVEL: int = 5
 FADE_SPEED: float = 30.0
-MIN_STAT_MULT: float = 1.1
-MAX_STAT_MULT: float = 1.3
+MIN_STAT_MULT: float = 1.05
+MAX_STAT_MULT: float = 1.35
 STAT_MULT_SEG_SIZE: float = 0.07
 STAT_MOD_AMOUNT: int = 3
 
