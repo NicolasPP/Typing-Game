@@ -33,13 +33,14 @@ class LifeCombo:
             stats.combo_fill.set(float(self.rect.width))
         else:
             stats.combo_fill.set(0.0)
-        stats.lives.add_callback(self.update_full_lives)
+        stats.lives.add_callback(lambda val: self.update_full_lives())
+        stats.life_pool.add_callback(lambda val: self.update_full_lives())
 
     def update_fill_width(self) -> None:
         self.set_fill_width(0)
 
-    def update_full_lives(self, lives: int) -> None:
-        self.full_lives = lives == GameStats.get().life_pool.get()
+    def update_full_lives(self) -> None:
+        self.full_lives = GameStats.get().lives.get() == GameStats.get().life_pool.get()
 
     def render(self) -> None:
         if GameStats.get().combo_fill.get() == 0.0: return
@@ -51,7 +52,6 @@ class LifeCombo:
             stats.combo_fill.set(0.0)
         elif fill_width >= self.rect.width:
             stats.combo_fill.set(float(self.rect.width))
-
             if not self.full_lives:
                 GameStats.get().lives.increment(1)
                 SoundManager.play(AppSounds.GAIN_LIFE)
