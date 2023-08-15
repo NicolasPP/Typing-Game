@@ -10,6 +10,7 @@ GUI_GAP: int = 5
 GAME_OVER_ALPHA: int = 70
 HOVER_ALPHA: int = 70
 REQUIRED_WORDS_ALPHA: int = 50
+ROLL_SIZE_RATIO: float = 0.7
 
 # -- Sounds --
 BACK_BUTTON_CLICK: str = "assets/sounds/back-button-click.wav"
