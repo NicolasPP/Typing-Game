@@ -44,6 +44,7 @@ class GamePage(Page):
             self.gui.game_over.render()
 
     def parse_event(self, event: Event) -> None:
+        self.state.parse_event(event)
         if event.type == KEYDOWN:
             self.state.process_key_code(event.key)
 

@@ -1,3 +1,4 @@
+from pygame.event import Event
 from pygame.key import name
 
 from game.components.board import Board
@@ -39,6 +40,9 @@ class GameState:
             text.render(self.board.surface)
         self.level_manager.render(self.board.surface)
         self.board.render()
+
+    def parse_event(self, event: Event) -> None:
+        self.level_manager.parse_event(event)
 
     def update(self, delta_time: float) -> None:
         stats: Stats = GameStats.get()
