@@ -50,17 +50,20 @@ class ButtonGui:
         self.hover_surface: Surface = self.create_hover_surface()
         self.rect: Rect = self.surface.get_rect()
         self.call_backs: dict[int, list[Callable[[], None]]] = {}
+        ThemeManager.add_call_back(self.update_button_theme)
+
+    def update_button_theme(self) -> None:
+        self.cfg = ButtonGui.get_default_config()
+        self.configure()
 
     def configure(self, label_color: tuple[int, int, int] | None = None,
                   hover_color: tuple[int, int, int] | None = None, hover_alpha: int | None = None,
                   font_size: int | None = None) -> None:
         if label_color is not None:
-            if self.label is not None and len(self.label) > 0:
-                self.cfg.label_color = label_color
+            self.cfg.label_color = label_color
 
         if font_size is not None:
-            if self.label is not None and len(self.label) > 0:
-                self.cfg.font_size = font_size
+            self.cfg.font_size = font_size
 
         if hover_color is not None:
             self.cfg.hover_color = hover_color
@@ -80,7 +83,9 @@ class ButtonGui:
     def create_surface(self) -> Surface:
         if self.label is None:
             assert self.size is not None, "both size and label can not be None"
-            return Surface(self.size)
+            surface: Surface = Surface(self.size)
+            surface.fill(self.cfg.label_color)
+            return surface
 
         font: Font = FontManager.get_font(self.cfg.font_size)
         return font.render(self.label, True, self.cfg.label_color)

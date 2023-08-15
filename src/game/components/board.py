@@ -4,8 +4,8 @@ from pygame import Rect
 from pygame import Surface
 from pygame import display
 
-from utils.window import Window
 from utils.themes import ThemeManager
+from utils.window import Window
 
 
 @dataclass
@@ -25,7 +25,7 @@ class Board:
         self.config: BoardConfig = Board.get_config()
         self.surface: Surface = Surface(self.rect.size)
         self.init_board_surface()
-        ThemeManager.add_call_back(self.theme_call_back)
+        ThemeManager.add_call_back(self.update_board_theme)
 
     def init_board_surface(self) -> None:
         self.clear()
@@ -36,6 +36,6 @@ class Board:
     def clear(self) -> None:
         self.surface.fill(self.config.background_color)
 
-    def theme_call_back(self) -> None:
+    def update_board_theme(self) -> None:
         self.config.background_color = ThemeManager.get_theme().foreground_primary
         self.init_board_surface()

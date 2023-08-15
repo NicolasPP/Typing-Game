@@ -18,6 +18,10 @@ class Text:
         self.counter_surface: Surface | None = None
         self.update_counter_surface()
         self.score_worth: int = len(word_values)
+        ThemeManager.add_call_back(self.update_text_theme)
+
+    def update_text_theme(self) -> None:
+        self.update_counter_surface()
 
     def update_counter_surface(self) -> None:
         font: Font = FontManager.get_font(DEFAULT_FONT_SIZE // 2)

@@ -1,6 +1,7 @@
 from pygame.key import name
 
 from game.components.board import Board
+from game.components.letter import Letter
 from game.components.level import LevelManager
 from game.components.text import Text
 from game.game_stats import GameStats
@@ -8,6 +9,7 @@ from game.game_stats import Stats
 from utils.accumulator import Accumulator
 from utils.sound_manager import AppSounds
 from utils.sound_manager import SoundManager
+from utils.themes import ThemeManager
 
 
 class GameState:
@@ -23,6 +25,13 @@ class GameState:
         self.current_text: Text | None = None
 
         GameStats.get().lives.add_callback(self.end_game)
+        ThemeManager.add_call_back(Letter.load_state_colors)
+        ThemeManager.add_call_back(self.update_state_theme, 1)
+
+    def update_state_theme(self) -> None:
+        current_text: Text | None = self.get_current_text()
+        if current_text is None: return
+        current_text.get_current_word().underline()
 
     def render(self) -> None:
         self.board.clear()

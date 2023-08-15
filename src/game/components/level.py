@@ -15,6 +15,7 @@ from game.components.text import Text
 from game.game_modifier import GameModifier
 from game.game_modifier import StatModifier
 from game.game_stats import GameStats
+from game.game_stats import Stats
 from utils.fonts import FontManager
 from utils.themes import Theme
 from utils.themes import ThemeManager
@@ -51,8 +52,12 @@ class LevelManager:
         self.state: LevelState = LevelState.PLAYING
         self.is_rolling: bool = False
 
+        stats: Stats = GameStats.get()
         self.update_word_req(GameStats.get().words_required.get())
-        GameStats.get().words_required.add_callback(self.update_word_req)
+        stats.words_required.add_callback(self.update_word_req)
+        ThemeManager.add_call_back(lambda: self.update_word_req(stats.words_required.get()), name="update "
+                                                                                                  "words "
+                                                                                                  "required theme")
 
     def reset(self) -> None:
         self.words_req.render = True

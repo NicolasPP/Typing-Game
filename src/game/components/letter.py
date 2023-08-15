@@ -5,8 +5,8 @@ from pygame import Rect
 from pygame import Surface
 from pygame.font import Font
 
-from config.theme_config import CORRECT_COLOR
 from config.game_config import LETTER_FONT_SIZE
+from config.theme_config import CORRECT_COLOR
 from config.theme_config import WRONG_COLOR
 from utils.fonts import FontManager
 from utils.themes import ThemeManager
@@ -33,6 +33,10 @@ class Letter:
         self.state: LetterState = LetterState.EMPTY
         self.surface: Surface = self.create_surface()
         self.rect: Rect = Rect(0, 0, *self.surface.get_size())
+        ThemeManager.add_call_back(self.update_letter_theme)
+
+    def update_letter_theme(self) -> None:
+        self.surface = self.create_surface()
 
     def create_surface(self) -> Surface:
         font: Font = FontManager.get_font(LETTER_FONT_SIZE)

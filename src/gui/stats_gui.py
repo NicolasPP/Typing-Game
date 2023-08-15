@@ -36,6 +36,13 @@ class StatsGui(GuiComponent):
         self.update_spawn_delay_surface(stats.spawn_delay.get())
         stats.spawn_delay.add_callback(self.update_spawn_delay_surface)
 
+        level_name: str = "update level num theme"
+        ThemeManager.add_call_back(lambda: self.update_level_num_surface(stats.level_num.get()), name=level_name)
+        speed_name: str = "update speed theme"
+        ThemeManager.add_call_back(lambda: self.update_speed_surface(stats.fall_speed.get()), name=speed_name)
+        spawn_name: str = "update spawn delay theme"
+        ThemeManager.add_call_back(lambda: self.update_spawn_delay_surface(stats.spawn_delay.get()), name=spawn_name)
+
     def update_level_num_surface(self, score: int) -> None:
         theme: Theme = ThemeManager.get_theme()
         surface: Surface = self.font.render(str(score), True, theme.foreground_primary, theme.background_primary)

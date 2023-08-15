@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 from enum import auto
 from typing import Callable
+from typing import NamedTuple
 
 from config.theme_config import DARK_BACKGROUND_PRIMARY
 from config.theme_config import DARK_BACKGROUND_SECONDARY
@@ -27,15 +28,21 @@ class Theme:
     background_secondary: tuple[int, int, int]
 
 
+class ThemeCallBack(NamedTuple):
+    func: Callable[[], None]
+    rank: int
+    name: str
+
+
 class ThemeManager:
     current_theme: Theme | None = None
     themes: dict[ThemeType, Theme] = {}
-    call_backs: list[Callable[[], None]] = []
+    call_backs: list[ThemeCallBack] = []
 
     @staticmethod
     def get_theme() -> Theme:
         if ThemeManager.current_theme is None:
-            ThemeManager.set_current_theme(ThemeType.DARK)
+            ThemeManager.set_current_theme(ThemeType.LIGHT)
 
         assert ThemeManager.current_theme is not None
         return ThemeManager.current_theme
@@ -44,7 +51,7 @@ class ThemeManager:
     def set_current_theme(theme_type: ThemeType) -> None:
         ThemeManager.current_theme = ThemeManager.get(theme_type)
         for call_back in ThemeManager.call_backs:
-            call_back()
+            call_back.func()
 
     @staticmethod
     def get(theme_type: ThemeType) -> Theme:
@@ -53,8 +60,10 @@ class ThemeManager:
         return theme
 
     @staticmethod
-    def add_call_back(call_back: Callable[[], None]) -> None:
-        ThemeManager.call_backs.append(call_back)
+    def add_call_back(func: Callable[[], None], rank: int = 0, name: str | None = None) -> None:
+        if name is None: name = func.__name__
+        ThemeManager.call_backs.append(ThemeCallBack(func, rank, name))
+        ThemeManager.call_backs.sort(key=lambda theme_cb: theme_cb.rank)
 
     @staticmethod
     def load_themes() -> None:
