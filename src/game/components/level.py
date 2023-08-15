@@ -1,7 +1,7 @@
 from dataclasses import dataclass
+from functools import partial
 from enum import Enum
 from enum import auto
-from math import ceil
 from random import choice
 
 from pygame import Rect
@@ -14,13 +14,13 @@ from config.game_config import DEFAULT_FONT_SIZE
 from config.game_config import FADE_SPEED
 from config.game_config import GUI_GAP
 from config.game_config import REQUIRED_WORDS_ALPHA
-from config.game_config import ROLL_SIZE_RATIO
 from game.components.text import Text
 from game.game_modifier import GameModifier
 from game.game_modifier import StatModifier
 from game.game_stats import GameStats
 from game.game_stats import Stats
 from gui.button_gui import ButtonGui
+from gui.button_gui import ButtonEvent
 from utils.fonts import FontManager
 from utils.themes import Theme
 from utils.themes import ThemeManager
@@ -30,9 +30,10 @@ from utils.word_data_manager import WordDataManager
 class LevelState(Enum):
     PLAYING = auto()
     HIDE_REQ_NUM = auto()
+    SHOW_BUFF_ROLL = auto()
+    SHOW_DEBUFF_ROLL = auto()
+    HIDE_ALL_ROLLS = auto()
     SHOW_REQ_NUM = auto()
-    SHOW_ROLL = auto()
-    HIDE_ROLL = auto()
 
 
 class FadeDirection(Enum):
@@ -44,7 +45,7 @@ class FadeDirection(Enum):
 class FadeInfo:
     direction: FadeDirection
     min_alpha: int
-    max_alpha: float
+    max_alpha: int
     speed: float
 
 
@@ -59,8 +60,7 @@ class WordsReq:
 @dataclass
 class Roll:
     surface: Surface
-    buffs: list[ButtonGui]
-    debuffs: list[ButtonGui]
+    mods: list[ButtonGui]
     fade_info: FadeInfo
     rect: Rect
     alpha: float = 0.0
@@ -71,7 +71,9 @@ class LevelManager:
         self.board_rect: Rect = board_rect
         self.words_per_level: int = BASE_WORDS_PER_LEVEL
         self.played_words: list[str] = []
-        self.roll: Roll | None = None
+        self.parse_button_events = False
+        self.buff_roll: Roll | None = None
+        self.debuff_roll: Roll | None = None
         self.words_req: WordsReq = WordsReq(FadeInfo(FadeDirection.OUT, 0, REQUIRED_WORDS_ALPHA, FADE_SPEED))
         self.state: LevelState = LevelState.PLAYING
         self.is_rolling: bool = False
@@ -88,9 +90,10 @@ class LevelManager:
         self.words_per_level = BASE_WORDS_PER_LEVEL
 
     def parse_event(self, event: Event) -> None:
-        if self.roll is not None:
-            for button in self.roll.buffs + self.roll.debuffs:
-                button.parse_event(event, self.get_roll_surface_offset())
+        if not self.parse_button_events: return
+        if self.buff_roll is not None:
+            for button in self.buff_roll.mods:
+                button.parse_event(event, self.get_roll_surface_offset(self.buff_roll))
 
     def update_word_req(self, words_req: int) -> None:
         if words_req == 0: self.set_is_rolling(True)
@@ -127,25 +130,36 @@ class LevelManager:
             is_fade_done: bool = fade_overtime(self.words_req, delta_time)
             if is_fade_done:
                 self.words_req.fade_info.direction = FadeDirection.IN
-                self.state = LevelState.SHOW_ROLL
+                self.state = LevelState.SHOW_BUFF_ROLL
                 self.words_req.render = False
                 self.words_per_level += BASE_WORDS_PER_LEVEL
                 GameStats.get().words_required.set(self.words_per_level)
+                self.parse_button_events = True
 
-        elif self.state is LevelState.SHOW_ROLL:
-            if self.roll is None: self.set_roll()
-            assert self.roll is not None, "roll object is missing"
-            is_fade_done: bool = fade_overtime(self.roll, delta_time)
-            # if is_fade_done:
-                # self.state = LevelState.HIDE_ROLL
-                # self.roll.fade_info.direction = FadeDirection.OUT
+        elif self.state is LevelState.SHOW_BUFF_ROLL:
+            if self.buff_roll is None: self.set_buff_roll()
+            assert self.buff_roll is not None, "buff roll object is missing"
+            fade_overtime(self.buff_roll, delta_time)
 
-        elif self.state is LevelState.HIDE_ROLL:
-            assert self.roll is not None, "roll object is missing"
-            is_fade_done: bool = fade_overtime(self.roll, delta_time)
+        elif self.state is LevelState.SHOW_DEBUFF_ROLL:
+            if self.debuff_roll is None: self.set_debuff_roll()
+            assert self.debuff_roll is not None, "debuff roll object is missing"
+            is_fade_done: bool = fade_overtime(self.debuff_roll, delta_time)
             if is_fade_done:
+                self.state = LevelState.HIDE_ALL_ROLLS
+                self.debuff_roll.fade_info.direction = FadeDirection.OUT
+                self.buff_roll.fade_info.direction = FadeDirection.OUT
+
+        elif self.state is LevelState.HIDE_ALL_ROLLS:
+            assert self.buff_roll is not None, "buff roll object is missing"
+            assert self.debuff_roll is not None, "debuff roll object is missing"
+            is_buff_fade_done: bool = fade_overtime(self.buff_roll, delta_time)
+            is_debuff_fade_done: bool = fade_overtime(self.debuff_roll, delta_time)
+            if is_buff_fade_done and is_debuff_fade_done:
+                print("hello")
                 self.state = LevelState.SHOW_REQ_NUM
-                self.roll = None
+                self.buff_roll = None
+                self.debuff_roll = None
                 self.words_req.render = True
 
         elif self.state is LevelState.SHOW_REQ_NUM:
@@ -154,30 +168,73 @@ class LevelManager:
                 self.state = LevelState.PLAYING
                 self.set_is_rolling(False)
 
-    def set_roll(self) -> None:
-        buffs: list[StatModifier] = GameModifier.roll_buffs()
+    def set_debuff_roll(self) -> None:
         debuffs: list[StatModifier] = GameModifier.roll_debuffs()
-        debuff_buttons: list[ButtonGui] = [ButtonGui(debuff.name) for debuff in debuffs]
-        buff_buttons: list[ButtonGui] = [ButtonGui(buff.name) for buff in buffs]
-        fade_info: FadeInfo = FadeInfo(FadeDirection.IN, 0, 255, FADE_SPEED * 2)
-        width, height = ceil(self.board_rect.width * ROLL_SIZE_RATIO), ceil(self.board_rect.height * ROLL_SIZE_RATIO)
-        surface: Surface = Surface((width, height))
-        rect: Rect = surface.get_rect(center=(self.board_rect.w // 2, self.board_rect.h // 2))
-        surface.set_alpha(fade_info.min_alpha)
+        assert len(debuffs) == 3, "must roll 3 debuffs"
 
-        prev_rect: Rect | None = None
-        for button in buff_buttons + debuff_buttons:
-            button.configure(font_size=20)
+        debuff_buttons: list[ButtonGui] = [ButtonGui(debuff.name) for debuff in debuffs]
+        debuff_fade_info: FadeInfo = FadeInfo(FadeDirection.IN, 0, 255, FADE_SPEED * 2)
+
+        debuff_w: int = max([b.rect.w for b in debuff_buttons]) + (GUI_GAP * 2)
+        debuff_h: int = (GUI_GAP * 4) + sum([b.rect.h for b in debuff_buttons])
+        debuff_surface: Surface = Surface((debuff_w, debuff_h))
+
+        debuff_rect: Rect = debuff_surface.get_rect(midtop=(self.board_rect.w // 2, self.board_rect.h // 2))
+        debuff_rect.y += GUI_GAP
+        debuff_surface.set_alpha(debuff_fade_info.min_alpha)
+
+        prev_rect = None
+        for button in debuff_buttons:
             if prev_rect is None:
-                button.rect.midtop = rect.w // 2, 0
+                button.rect.topleft = GUI_GAP, GUI_GAP
             else:
                 button.rect.midtop = prev_rect.midbottom
 
-            button.rect.y += (GUI_GAP * 2)
+            button.rect.y += GUI_GAP
             prev_rect = button.rect
 
-        surface.fill('red')
-        self.roll = Roll(surface, buff_buttons, debuff_buttons, fade_info, rect)
+        debuff_surface.fill(ThemeManager.get_theme().foreground_primary)
+        self.debuff_roll = Roll(debuff_surface, debuff_buttons, debuff_fade_info, debuff_rect)
+
+    def set_buff_roll(self) -> None:
+        buffs: list[StatModifier] = GameModifier.roll_buffs()
+        assert len(buffs) == 3, "must roll 3 buffs"
+
+        buff_buttons: list[ButtonGui] = []
+        for buff in buffs:
+            button: ButtonGui = ButtonGui(buff.name)
+            button.configure(label_color=ThemeManager.get_theme().background_primary)
+            button.add_call_back(ButtonEvent.LEFT_CLICK, partial(self.buff_button_click, buff))
+            buff_buttons.append(button)
+        buff_fade_info: FadeInfo = FadeInfo(FadeDirection.IN, 0, 255, FADE_SPEED * 2)
+
+        buff_h: int = (GUI_GAP * 4 * 3) + (max([b.rect.h for b in buff_buttons]) * 2)
+        buff_w: int = (GUI_GAP * 4 * 3) + (
+                    sum([b.rect.w for b in buff_buttons]) - max([b.rect.w for b in buff_buttons]))
+        buff_surface: Surface = Surface((buff_w, buff_h))
+
+        buff_rect: Rect = buff_surface.get_rect(midbottom=(self.board_rect.w // 2, self.board_rect.h // 2))
+        buff_rect.y -= GUI_GAP
+        buff_surface.set_alpha(buff_fade_info.min_alpha)
+
+        max_w_b: ButtonGui = max(buff_buttons, key=lambda b: b.rect.w)
+        print(max_w_b)
+        prev_rect: Rect | None = None
+        for button in buff_buttons:
+            if button == max_w_b: continue
+            if prev_rect is None:
+                button.rect.topleft = (GUI_GAP * 4, GUI_GAP * 4)
+            else:
+                button.rect.midleft = prev_rect.midright
+                button.rect.x += (GUI_GAP * 4)
+            prev_rect = button.rect
+
+        max_w_b.rect.center = buff_rect.w // 2, buff_rect.h // 2
+        max_w_b.rect.top = prev_rect.bottom
+        max_w_b.rect.y += (GUI_GAP * 4)
+
+        buff_surface.fill(ThemeManager.get_theme().foreground_primary)
+        self.buff_roll = Roll(buff_surface, buff_buttons, buff_fade_info, buff_rect)
 
     def render(self, board_surface: Surface) -> None:
         if self.words_req.surface is None: return
@@ -185,15 +242,32 @@ class LevelManager:
             pos: Rect = self.words_req.surface.get_rect(center=(self.board_rect.w // 2, self.board_rect.h // 2))
             board_surface.blit(self.words_req.surface, pos)
 
-        if self.roll is not None:
-            self.roll.surface.fill('red')
-            for button in self.roll.buffs + self.roll.debuffs:
-                button.render(self.roll.surface, self.get_roll_surface_offset())
-            board_surface.blit(self.roll.surface, self.roll.rect)
+        if self.buff_roll is not None:
+            self.buff_roll.surface.fill(ThemeManager.get_theme().foreground_primary)
 
-    def get_roll_surface_offset(self) -> tuple[int, int]:
-        assert self.roll is not None, "roll object missing"
-        return self.board_rect.x + self.roll.rect.x, self.board_rect.y + self.roll.rect.y
+            for button in self.buff_roll.mods:
+                button.render(self.buff_roll.surface, self.get_roll_surface_offset(self.buff_roll))
+
+            board_surface.blit(self.buff_roll.surface, self.buff_roll.rect)
+
+        if self.debuff_roll is not None:
+            self.debuff_roll.surface.fill(ThemeManager.get_theme().foreground_primary)
+
+            for button in self.debuff_roll.mods:
+                button.render(self.debuff_roll.surface, self.get_roll_surface_offset(self.debuff_roll))
+
+            board_surface.blit(self.debuff_roll.surface, self.debuff_roll.rect)
+
+    def get_roll_surface_offset(self, roll: Roll | None) -> tuple[int, int]:
+        assert roll is not None, "roll object missing"
+        return self.board_rect.x + roll.rect.x, self.board_rect.y + roll.rect.y
+
+    def buff_button_click(self, mod: StatModifier) -> None:
+        self.state = LevelState.SHOW_DEBUFF_ROLL
+        self.buff_roll.alpha = self.buff_roll.fade_info.max_alpha
+        self.buff_roll.surface.set_alpha(self.buff_roll.fade_info.max_alpha)
+        self.parse_button_events = False
+        mod.apply()
 
 
 def fade_overtime(fade_obj: WordsReq | Roll, delta_time: float) -> bool:
