@@ -79,6 +79,7 @@ class LevelManager:
         else:
             GameStats.get().level_num.increment(1)
         self.is_rolling = is_rolling
+        GameStats.get().is_rolling.set(is_rolling)
 
     def get_text(self) -> Text:
         text_length: int = roll_text_length()

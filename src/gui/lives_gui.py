@@ -68,6 +68,7 @@ class LifeCombo:
 
     def update(self, delta_time: float) -> None:
         stats: Stats = GameStats.get()
+        if stats.is_rolling.get(): return
         if stats.lives.get() == stats.life_pool.get(): return
         self.set_fill_width(stats.combo_fill.get() - (stats.combo_speed.get() * delta_time))
         self.surface = Surface((ceil(stats.combo_fill.get()), self.rect.height))
