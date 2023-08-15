@@ -73,6 +73,9 @@ class ButtonGui:
 
         self.surface = self.create_surface()
         self.hover_surface = self.create_hover_surface()
+        rect: Rect = self.surface.get_rect()
+        rect.topleft = self.rect.topleft
+        self.rect = rect
 
     def create_hover_surface(self) -> Surface:
         hover_surface: Surface = Surface(self.surface.get_size())
@@ -90,15 +93,15 @@ class ButtonGui:
         font: Font = FontManager.get_font(self.cfg.font_size)
         return font.render(self.label, True, self.cfg.label_color)
 
-    def render(self, parent_surface: Surface) -> None:
+    def render(self, parent_surface: Surface, offset: tuple[int, int] = (0, 0)) -> None:
         parent_surface.blit(self.surface, self.rect)
-        if self.is_collided((parent_surface.get_rect().x, parent_surface.get_rect().y)):
+        if self.is_collided(offset):
             parent_surface.blit(self.hover_surface, self.rect)
 
     def is_collided(self, offset: tuple[int, int]) -> bool:
         x, y = mouse.get_pos()
         off_x, off_y = offset
-        return self.rect.collidepoint(x + off_x, y + off_y)
+        return self.rect.collidepoint(x - off_x, y - off_y)
 
     def parse_event(self, event: Event, parent_offset: tuple[int, int] = (0, 0)) -> None:
         if event.type != MOUSEBUTTONDOWN: return
