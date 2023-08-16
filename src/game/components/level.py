@@ -55,9 +55,15 @@ class FadeInfo:
 @dataclass
 class LevelEntity:
     fade_info: FadeInfo
-    render: bool = True
+    req_render: bool = True
     surface: Surface | None = None
     alpha: float = float(REQUIRED_WORDS_ALPHA)
+
+    def render(self, board_surface: Surface, rect: Rect | None = None) -> None:
+        if self.surface is None: return
+        if not self.req_render: return
+        if rect is None: rect = self.surface.get_rect()
+        board_surface.blit(self.surface, rect)
 
 
 @dataclass
@@ -89,7 +95,7 @@ class LevelManager:
         self.debuff_roll: Roll | None = None
         self.words_req: LevelEntity = LevelEntity(FadeInfo(FadeDirection.OUT, 0, REQUIRED_WORDS_ALPHA, FADE_SPEED))
         self.background: LevelEntity = LevelEntity(FadeInfo(FadeDirection.IN, 0, BACKGROUND_ALPHA, FADE_SPEED * 3),
-                                                   render=False)
+                                                   req_render=False)
         self.state: LevelState = LevelState.PLAYING
         self.is_rolling: bool = False
 
@@ -155,11 +161,11 @@ class LevelManager:
             if fade_overtime(self.words_req, delta_time):
                 self.words_req.fade_info.direction = FadeDirection.IN
                 self.state = LevelState.SHOW_BUFF_ROLL
-                self.words_req.render = False
+                self.words_req.req_render = False
                 self.words_per_level += BASE_WORDS_PER_LEVEL
                 GameStats.get().words_required.set(self.words_per_level)
                 self.parse_button_events = True
-                self.background.render = True
+                self.background.req_render = True
 
         elif self.state is LevelState.SHOW_BUFF_ROLL:
             if self.buff_roll is None: self.set_buff_roll()
@@ -189,8 +195,8 @@ class LevelManager:
                 self.state = LevelState.SHOW_REQ_NUM
                 self.buff_roll = None
                 self.debuff_roll = None
-                self.words_req.render = True
-                self.background.render = False
+                self.words_req.req_render = True
+                self.background.req_render = False
 
         elif self.state is LevelState.SHOW_REQ_NUM:
             if fade_overtime(self.words_req, delta_time):
@@ -276,12 +282,9 @@ class LevelManager:
 
     def render(self, board_surface: Surface) -> None:
 
-        if self.background.render and self.background.surface is not None:
-            board_surface.blit(self.background.surface, self.background.surface.get_rect())
-
-        if self.words_req.render and self.words_req.surface is not None:
-            pos: Rect = self.words_req.surface.get_rect(center=(self.board_rect.w // 2, self.board_rect.h // 2))
-            board_surface.blit(self.words_req.surface, pos)
+        self.background.render(board_surface)
+        pos: Rect = self.words_req.surface.get_rect(center=(self.board_rect.w // 2, self.board_rect.h // 2))
+        self.words_req.render(board_surface, pos)
 
         if self.buff_roll is not None:
             self.buff_roll.render(board_surface, self.board_rect)
