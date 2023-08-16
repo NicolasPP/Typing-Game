@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-from functools import partial
 from enum import Enum
 from enum import auto
+from functools import partial
 from random import choice
 
 from pygame import Rect
@@ -14,13 +14,15 @@ from config.game_config import DEFAULT_FONT_SIZE
 from config.game_config import FADE_SPEED
 from config.game_config import GUI_GAP
 from config.game_config import REQUIRED_WORDS_ALPHA
+from config.theme_config import DEBUFF_COLOR
+from config.game_config import DEBUFF_FONT_SIZE
 from game.components.text import Text
 from game.game_modifier import GameModifier
 from game.game_modifier import StatModifier
 from game.game_stats import GameStats
 from game.game_stats import Stats
-from gui.button_gui import ButtonGui
 from gui.button_gui import ButtonEvent
+from gui.button_gui import ButtonGui
 from utils.fonts import FontManager
 from utils.themes import Theme
 from utils.themes import ThemeManager
@@ -181,11 +183,16 @@ class LevelManager:
         debuffs: list[StatModifier] = GameModifier.roll_debuffs()
         assert len(debuffs) == 3, "must roll 3 debuffs"
 
-        buttons: list[ButtonGui] = [ButtonGui(debuff.name) for debuff in debuffs]
+        buttons: list[ButtonGui] = []
+        for debuff in debuffs:
+            button: ButtonGui = ButtonGui(debuff.name)
+            button.configure(is_hover_enabled=False, label_color=DEBUFF_COLOR, font_size=DEBUFF_FONT_SIZE)
+            buttons.append(button)
+
         fade_info: FadeInfo = FadeInfo(FadeDirection.IN, 0, 255, FADE_SPEED * 2)
 
-        width: int = max([b.rect.w for b in buttons]) + (GUI_GAP * 2)
-        height: int = (GUI_GAP * 4) + sum([b.rect.h for b in buttons])
+        width: int = max([b.rect.w for b in buttons]) + (GUI_GAP * 2 * 4)
+        height: int = (GUI_GAP * 4 * 4) + sum([b.rect.h for b in buttons])
         surface: Surface = Surface((width, height))
 
         rect: Rect = surface.get_rect(midtop=(self.board_rect.w // 2, self.board_rect.h // 2))
@@ -195,11 +202,11 @@ class LevelManager:
         prev_rect = None
         for button in buttons:
             if prev_rect is None:
-                button.rect.topleft = GUI_GAP, GUI_GAP
+                button.rect.midtop = rect.w // 2, (GUI_GAP * 4)
             else:
                 button.rect.midtop = prev_rect.midbottom
 
-            button.rect.y += GUI_GAP
+            button.rect.y += (GUI_GAP * 4)
             prev_rect = button.rect
 
         surface.fill(ThemeManager.get_theme().foreground_primary)
@@ -218,8 +225,7 @@ class LevelManager:
         fade_info: FadeInfo = FadeInfo(FadeDirection.IN, 0, 255, FADE_SPEED * 2)
 
         height: int = (GUI_GAP * 4 * 3) + (max([b.rect.h for b in buttons]) * 2)
-        width: int = (GUI_GAP * 4 * 3) + (
-                sum([b.rect.w for b in buttons]) - max([b.rect.w for b in buttons]))
+        width: int = (GUI_GAP * 4 * 3) + (sum([b.rect.w for b in buttons]) - max([b.rect.w for b in buttons]))
         surface: Surface = Surface((width, height))
 
         rect: Rect = surface.get_rect(midbottom=(self.board_rect.w // 2, self.board_rect.h // 2))

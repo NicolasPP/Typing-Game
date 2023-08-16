@@ -27,6 +27,7 @@ DRUM_HIT_NORMAL: str = "assets/sounds/drum-hitnormal.wav"
 # -- Font --
 DEFAULT_FONT_SIZE: int = 37
 LETTER_FONT_SIZE: int = 33
+DEBUFF_FONT_SIZE: int = 30
 
 # -- Base Values --
 SPAWN_DELAY: float = 3.0  # Seconds
