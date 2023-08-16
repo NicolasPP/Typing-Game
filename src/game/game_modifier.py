@@ -124,8 +124,8 @@ class GameModifier:
     @staticmethod
     def load_buffs() -> None:
         stats: Stats = GameStats.get()
-        increase_life_combo: FixedModifier = FixedModifier(stats.combo_multiplier, "LifeCombo+", "Gain extra life quicker",
-                                                           StatModifierType.INCREASE, 2)
+        increase_life_combo: FixedModifier = FixedModifier(stats.combo_multiplier, "LifeCombo+",
+                                                           "Gain extra life quicker", StatModifierType.INCREASE, 2)
         increase_life_pool: FixedModifier = FixedModifier(stats.life_pool, "LifePool+", "Increase life pool",
                                                           StatModifierType.INCREASE, 1)
         decrease_fall_speed: MultiplierModifier = MultiplierModifier(stats.fall_speed, "FallSpeed-",
