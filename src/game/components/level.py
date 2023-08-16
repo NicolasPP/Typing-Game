@@ -60,10 +60,20 @@ class WordsReq:
 @dataclass
 class Roll:
     surface: Surface
-    mods: list[ButtonGui]
+    buttons: list[ButtonGui]
+    mods: list[StatModifier]
     fade_info: FadeInfo
     rect: Rect
     alpha: float = 0.0
+
+    def render(self, board_surface: Surface, board_rect: Rect) -> None:
+        self.surface.fill(ThemeManager.get_theme().foreground_primary)
+        for button in self.buttons:
+            button.render(self.surface, self.get_offset(board_rect))
+        board_surface.blit(self.surface, self.rect)
+
+    def get_offset(self, board_rect: Rect) -> tuple[int, int]:
+        return board_rect.x + self.rect.x, board_rect.y + self.rect.y
 
 
 class LevelManager:
@@ -92,8 +102,8 @@ class LevelManager:
     def parse_event(self, event: Event) -> None:
         if not self.parse_button_events: return
         if self.buff_roll is not None:
-            for button in self.buff_roll.mods:
-                button.parse_event(event, self.get_roll_surface_offset(self.buff_roll))
+            for button in self.buff_roll.buttons:
+                button.parse_event(event, self.buff_roll.get_offset(self.board_rect))
 
     def update_word_req(self, words_req: int) -> None:
         if words_req == 0: self.set_is_rolling(True)
@@ -127,8 +137,7 @@ class LevelManager:
             return
 
         elif self.state is LevelState.HIDE_REQ_NUM:
-            is_fade_done: bool = fade_overtime(self.words_req, delta_time)
-            if is_fade_done:
+            if fade_overtime(self.words_req, delta_time):
                 self.words_req.fade_info.direction = FadeDirection.IN
                 self.state = LevelState.SHOW_BUFF_ROLL
                 self.words_req.render = False
@@ -144,11 +153,11 @@ class LevelManager:
         elif self.state is LevelState.SHOW_DEBUFF_ROLL:
             if self.debuff_roll is None: self.set_debuff_roll()
             assert self.debuff_roll is not None, "debuff roll object is missing"
-            is_fade_done: bool = fade_overtime(self.debuff_roll, delta_time)
-            if is_fade_done:
+            if fade_overtime(self.debuff_roll, delta_time):
                 self.state = LevelState.HIDE_ALL_ROLLS
                 self.debuff_roll.fade_info.direction = FadeDirection.OUT
                 self.buff_roll.fade_info.direction = FadeDirection.OUT
+                for mod in self.debuff_roll.mods: mod.apply()
 
         elif self.state is LevelState.HIDE_ALL_ROLLS:
             assert self.buff_roll is not None, "buff roll object is missing"
@@ -156,15 +165,14 @@ class LevelManager:
             is_buff_fade_done: bool = fade_overtime(self.buff_roll, delta_time)
             is_debuff_fade_done: bool = fade_overtime(self.debuff_roll, delta_time)
             if is_buff_fade_done and is_debuff_fade_done:
-                print("hello")
                 self.state = LevelState.SHOW_REQ_NUM
                 self.buff_roll = None
                 self.debuff_roll = None
                 self.words_req.render = True
 
         elif self.state is LevelState.SHOW_REQ_NUM:
-            is_fade_done: bool = fade_overtime(self.words_req, delta_time)
-            if is_fade_done:
+            if fade_overtime(self.words_req, delta_time):
+                self.words_req.fade_info.direction = FadeDirection.OUT
                 self.state = LevelState.PLAYING
                 self.set_is_rolling(False)
 
@@ -172,19 +180,19 @@ class LevelManager:
         debuffs: list[StatModifier] = GameModifier.roll_debuffs()
         assert len(debuffs) == 3, "must roll 3 debuffs"
 
-        debuff_buttons: list[ButtonGui] = [ButtonGui(debuff.name) for debuff in debuffs]
-        debuff_fade_info: FadeInfo = FadeInfo(FadeDirection.IN, 0, 255, FADE_SPEED * 2)
+        buttons: list[ButtonGui] = [ButtonGui(debuff.name) for debuff in debuffs]
+        fade_info: FadeInfo = FadeInfo(FadeDirection.IN, 0, 255, FADE_SPEED * 2)
 
-        debuff_w: int = max([b.rect.w for b in debuff_buttons]) + (GUI_GAP * 2)
-        debuff_h: int = (GUI_GAP * 4) + sum([b.rect.h for b in debuff_buttons])
-        debuff_surface: Surface = Surface((debuff_w, debuff_h))
+        width: int = max([b.rect.w for b in buttons]) + (GUI_GAP * 2)
+        height: int = (GUI_GAP * 4) + sum([b.rect.h for b in buttons])
+        surface: Surface = Surface((width, height))
 
-        debuff_rect: Rect = debuff_surface.get_rect(midtop=(self.board_rect.w // 2, self.board_rect.h // 2))
-        debuff_rect.y += GUI_GAP
-        debuff_surface.set_alpha(debuff_fade_info.min_alpha)
+        rect: Rect = surface.get_rect(midtop=(self.board_rect.w // 2, self.board_rect.h // 2))
+        rect.y += GUI_GAP
+        surface.set_alpha(fade_info.min_alpha)
 
         prev_rect = None
-        for button in debuff_buttons:
+        for button in buttons:
             if prev_rect is None:
                 button.rect.topleft = GUI_GAP, GUI_GAP
             else:
@@ -193,34 +201,33 @@ class LevelManager:
             button.rect.y += GUI_GAP
             prev_rect = button.rect
 
-        debuff_surface.fill(ThemeManager.get_theme().foreground_primary)
-        self.debuff_roll = Roll(debuff_surface, debuff_buttons, debuff_fade_info, debuff_rect)
+        surface.fill(ThemeManager.get_theme().foreground_primary)
+        self.debuff_roll = Roll(surface, buttons, debuffs, fade_info, rect)
 
     def set_buff_roll(self) -> None:
         buffs: list[StatModifier] = GameModifier.roll_buffs()
         assert len(buffs) == 3, "must roll 3 buffs"
 
-        buff_buttons: list[ButtonGui] = []
+        buttons: list[ButtonGui] = []
         for buff in buffs:
             button: ButtonGui = ButtonGui(buff.name)
             button.configure(label_color=ThemeManager.get_theme().background_primary)
             button.add_call_back(ButtonEvent.LEFT_CLICK, partial(self.buff_button_click, buff))
-            buff_buttons.append(button)
-        buff_fade_info: FadeInfo = FadeInfo(FadeDirection.IN, 0, 255, FADE_SPEED * 2)
+            buttons.append(button)
+        fade_info: FadeInfo = FadeInfo(FadeDirection.IN, 0, 255, FADE_SPEED * 2)
 
-        buff_h: int = (GUI_GAP * 4 * 3) + (max([b.rect.h for b in buff_buttons]) * 2)
-        buff_w: int = (GUI_GAP * 4 * 3) + (
-                    sum([b.rect.w for b in buff_buttons]) - max([b.rect.w for b in buff_buttons]))
-        buff_surface: Surface = Surface((buff_w, buff_h))
+        height: int = (GUI_GAP * 4 * 3) + (max([b.rect.h for b in buttons]) * 2)
+        width: int = (GUI_GAP * 4 * 3) + (
+                sum([b.rect.w for b in buttons]) - max([b.rect.w for b in buttons]))
+        surface: Surface = Surface((width, height))
 
-        buff_rect: Rect = buff_surface.get_rect(midbottom=(self.board_rect.w // 2, self.board_rect.h // 2))
-        buff_rect.y -= GUI_GAP
-        buff_surface.set_alpha(buff_fade_info.min_alpha)
+        rect: Rect = surface.get_rect(midbottom=(self.board_rect.w // 2, self.board_rect.h // 2))
+        rect.y -= GUI_GAP
+        surface.set_alpha(fade_info.min_alpha)
 
-        max_w_b: ButtonGui = max(buff_buttons, key=lambda b: b.rect.w)
-        print(max_w_b)
+        max_w_b: ButtonGui = max(buttons, key=lambda b: b.rect.w)
         prev_rect: Rect | None = None
-        for button in buff_buttons:
+        for button in buttons:
             if button == max_w_b: continue
             if prev_rect is None:
                 button.rect.topleft = (GUI_GAP * 4, GUI_GAP * 4)
@@ -229,12 +236,12 @@ class LevelManager:
                 button.rect.x += (GUI_GAP * 4)
             prev_rect = button.rect
 
-        max_w_b.rect.center = buff_rect.w // 2, buff_rect.h // 2
+        max_w_b.rect.center = rect.w // 2, rect.h // 2
         max_w_b.rect.top = prev_rect.bottom
         max_w_b.rect.y += (GUI_GAP * 4)
 
-        buff_surface.fill(ThemeManager.get_theme().foreground_primary)
-        self.buff_roll = Roll(buff_surface, buff_buttons, buff_fade_info, buff_rect)
+        surface.fill(ThemeManager.get_theme().foreground_primary)
+        self.buff_roll = Roll(surface, buttons, buffs, fade_info, rect)
 
     def render(self, board_surface: Surface) -> None:
         if self.words_req.surface is None: return
@@ -243,24 +250,10 @@ class LevelManager:
             board_surface.blit(self.words_req.surface, pos)
 
         if self.buff_roll is not None:
-            self.buff_roll.surface.fill(ThemeManager.get_theme().foreground_primary)
-
-            for button in self.buff_roll.mods:
-                button.render(self.buff_roll.surface, self.get_roll_surface_offset(self.buff_roll))
-
-            board_surface.blit(self.buff_roll.surface, self.buff_roll.rect)
+            self.buff_roll.render(board_surface, self.board_rect)
 
         if self.debuff_roll is not None:
-            self.debuff_roll.surface.fill(ThemeManager.get_theme().foreground_primary)
-
-            for button in self.debuff_roll.mods:
-                button.render(self.debuff_roll.surface, self.get_roll_surface_offset(self.debuff_roll))
-
-            board_surface.blit(self.debuff_roll.surface, self.debuff_roll.rect)
-
-    def get_roll_surface_offset(self, roll: Roll | None) -> tuple[int, int]:
-        assert roll is not None, "roll object missing"
-        return self.board_rect.x + roll.rect.x, self.board_rect.y + roll.rect.y
+            self.debuff_roll.render(board_surface, self.board_rect)
 
     def buff_button_click(self, mod: StatModifier) -> None:
         self.state = LevelState.SHOW_DEBUFF_ROLL
@@ -271,6 +264,12 @@ class LevelManager:
 
 
 def fade_overtime(fade_obj: WordsReq | Roll, delta_time: float) -> bool:
+    diff: float = fade_obj.fade_info.speed * delta_time
+    if fade_obj.fade_info.direction is FadeDirection.IN:
+        fade_obj.alpha += diff
+    else:
+        fade_obj.alpha -= diff
+
     if fade_obj.fade_info.direction is FadeDirection.IN:
         if fade_obj.alpha >= fade_obj.fade_info.max_alpha:
             fade_obj.alpha = fade_obj.fade_info.max_alpha
@@ -279,12 +278,6 @@ def fade_overtime(fade_obj: WordsReq | Roll, delta_time: float) -> bool:
         if fade_obj.alpha <= fade_obj.fade_info.min_alpha:
             fade_obj.alpha = fade_obj.fade_info.min_alpha
             return True
-
-    diff: float = fade_obj.fade_info.speed * delta_time
-    if fade_obj.fade_info.direction is FadeDirection.IN:
-        fade_obj.alpha += diff
-    else:
-        fade_obj.alpha -= diff
 
     fade_obj.surface.set_alpha(int(fade_obj.alpha))
     return False
