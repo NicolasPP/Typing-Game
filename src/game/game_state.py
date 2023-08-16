@@ -132,4 +132,4 @@ class GameState:
         if lives_count <= 0:
             GameStats.get().game_over.set(True)
             self.texts.clear()
-            self.level_manager.words_req.render = False
+            self.level_manager.words_req.req_render = False

@@ -7,6 +7,7 @@ LIFE_SURF_SIZE: int = 40
 OUTLINE_THICKNESS: int = 5
 LIFE_COMBO_HEIGHT: int = 3
 GUI_GAP: int = 5
+ROLL_GAP: int = 30
 GAME_OVER_ALPHA: int = 70
 HOVER_ALPHA: int = 70
 REQUIRED_WORDS_ALPHA: int = 50
@@ -54,13 +55,14 @@ BUTTON_CLICK_VOLUME_MULT: float = 1.0
 LOSE_LIFE_VOLUME_MULT: float = 1.0
 GAIN_LIFE_VOLUME_MULT: float = 1.0
 BASE_WORDS_PER_LEVEL: int = 5
-FADE_SPEED: float = 60.0
+BG_FADE_SPEED: float = 180.0
+WORDS_REQ_FADE_SPEED: float = 60.0
+ROLL_FADE_SPEED: float = 120.0
 MIN_STAT_MULT: float = 1.0
 MAX_STAT_MULT: float = 1.60
 STAT_MULT_SEG_SIZE: float = 0.1
 STAT_MOD_AMOUNT: int = 3
 MAX_MODIFIER_LEVEL: int = 15
-
 
 # -- files --
 WORDS_FILE: str = "data/words/words_frequency.txt"
