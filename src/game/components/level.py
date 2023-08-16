@@ -10,6 +10,7 @@ from pygame.event import Event
 from pygame.font import Font
 
 from config.game_config import BASE_WORDS_PER_LEVEL
+from config.game_config import BACKGROUND_ALPHA
 from config.game_config import DEFAULT_FONT_SIZE
 from config.game_config import FADE_SPEED
 from config.game_config import GUI_GAP
@@ -52,7 +53,7 @@ class FadeInfo:
 
 
 @dataclass
-class WordsReq:
+class LevelEntity:
     fade_info: FadeInfo
     render: bool = True
     surface: Surface | None = None
@@ -86,16 +87,28 @@ class LevelManager:
         self.parse_button_events = False
         self.buff_roll: Roll | None = None
         self.debuff_roll: Roll | None = None
-        self.words_req: WordsReq = WordsReq(FadeInfo(FadeDirection.OUT, 0, REQUIRED_WORDS_ALPHA, FADE_SPEED))
+        self.words_req: LevelEntity = LevelEntity(FadeInfo(FadeDirection.OUT, 0, REQUIRED_WORDS_ALPHA, FADE_SPEED))
+        self.background: LevelEntity = LevelEntity(FadeInfo(FadeDirection.IN, 0, BACKGROUND_ALPHA, FADE_SPEED * 3),
+                                                   render=False)
         self.state: LevelState = LevelState.PLAYING
         self.is_rolling: bool = False
 
         stats: Stats = GameStats.get()
         self.update_word_req(GameStats.get().words_required.get())
+        self.update_background()
         stats.words_required.add_callback(self.update_word_req)
+        ThemeManager.add_call_back(self.update_level_theme)
 
-        word_req_name: str = "update words required theme"
-        ThemeManager.add_call_back(lambda: self.update_word_req(stats.words_required.get()), name=word_req_name)
+    def update_level_theme(self) -> None:
+        stats: Stats = GameStats.get()
+        self.update_word_req(stats.words_required.get())
+        self.update_background()
+
+    def update_background(self) -> None:
+        surface: Surface = Surface(self.board_rect.size)
+        surface.fill(ThemeManager.get_theme().foreground_primary)
+        surface.set_alpha(self.background.fade_info.max_alpha)
+        self.background.surface = surface
 
     def reset(self) -> None:
         self.words_req.render = True
@@ -146,17 +159,20 @@ class LevelManager:
                 self.words_per_level += BASE_WORDS_PER_LEVEL
                 GameStats.get().words_required.set(self.words_per_level)
                 self.parse_button_events = True
+                self.background.render = True
 
         elif self.state is LevelState.SHOW_BUFF_ROLL:
             if self.buff_roll is None: self.set_buff_roll()
             assert self.buff_roll is not None, "buff roll object is missing"
             fade_overtime(self.buff_roll, delta_time)
+            fade_overtime(self.background, delta_time)
 
         elif self.state is LevelState.SHOW_DEBUFF_ROLL:
             if self.debuff_roll is None: self.set_debuff_roll()
             assert self.debuff_roll is not None, "debuff roll object is missing"
             assert self.buff_roll is not None, "debuff roll object is missing"
             if fade_overtime(self.debuff_roll, delta_time):
+                self.background.fade_info.direction = FadeDirection.OUT
                 self.state = LevelState.HIDE_ALL_ROLLS
                 self.debuff_roll.fade_info.direction = FadeDirection.OUT
                 self.buff_roll.fade_info.direction = FadeDirection.OUT
@@ -165,13 +181,16 @@ class LevelManager:
         elif self.state is LevelState.HIDE_ALL_ROLLS:
             assert self.buff_roll is not None, "buff roll object is missing"
             assert self.debuff_roll is not None, "debuff roll object is missing"
+            fade_overtime(self.background, delta_time)
             is_buff_fade_done: bool = fade_overtime(self.buff_roll, delta_time)
             is_debuff_fade_done: bool = fade_overtime(self.debuff_roll, delta_time)
             if is_buff_fade_done and is_debuff_fade_done:
+                self.background.fade_info.direction = FadeDirection.IN
                 self.state = LevelState.SHOW_REQ_NUM
                 self.buff_roll = None
                 self.debuff_roll = None
                 self.words_req.render = True
+                self.background.render = False
 
         elif self.state is LevelState.SHOW_REQ_NUM:
             if fade_overtime(self.words_req, delta_time):
@@ -191,7 +210,8 @@ class LevelManager:
 
         fade_info: FadeInfo = FadeInfo(FadeDirection.IN, 0, 255, FADE_SPEED * 2)
 
-        width: int = max([b.rect.w for b in buttons]) + (GUI_GAP * 2 * 4)
+        max_width_button: ButtonGui = max(buttons, key=lambda b: b.rect.width)
+        width: int = max_width_button.rect.width + (GUI_GAP * 2 * 4)
         height: int = (GUI_GAP * 4 * 4) + sum([b.rect.h for b in buttons])
         surface: Surface = Surface((width, height))
 
@@ -199,14 +219,17 @@ class LevelManager:
         rect.y += GUI_GAP
         surface.set_alpha(fade_info.min_alpha)
 
+        max_width_button.rect.topleft = GUI_GAP * 4, GUI_GAP * 4
+
         prev_rect = None
         for button in buttons:
+            if button == max_width_button: continue
             if prev_rect is None:
-                button.rect.midtop = rect.w // 2, (GUI_GAP * 4)
+                button.rect.midtop = max_width_button.rect.midbottom
             else:
                 button.rect.midtop = prev_rect.midbottom
 
-            button.rect.y += (GUI_GAP * 4)
+            button.rect.y += GUI_GAP * 4
             prev_rect = button.rect
 
         surface.fill(ThemeManager.get_theme().foreground_primary)
@@ -252,8 +275,11 @@ class LevelManager:
         self.buff_roll = Roll(surface, buttons, buffs, fade_info, rect)
 
     def render(self, board_surface: Surface) -> None:
-        if self.words_req.surface is None: return
-        if self.words_req.render:
+
+        if self.background.render and self.background.surface is not None:
+            board_surface.blit(self.background.surface, self.background.surface.get_rect())
+
+        if self.words_req.render and self.words_req.surface is not None:
             pos: Rect = self.words_req.surface.get_rect(center=(self.board_rect.w // 2, self.board_rect.h // 2))
             board_surface.blit(self.words_req.surface, pos)
 
@@ -272,7 +298,7 @@ class LevelManager:
         mod.apply()
 
 
-def fade_overtime(fade_obj: WordsReq | Roll, delta_time: float) -> bool:
+def fade_overtime(fade_obj: LevelEntity | Roll, delta_time: float) -> bool:
     diff: float = fade_obj.fade_info.speed * delta_time
     if fade_obj.fade_info.direction is FadeDirection.IN:
         fade_obj.alpha += diff
