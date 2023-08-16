@@ -9,10 +9,9 @@ LIFE_COMBO_HEIGHT: int = 3
 GUI_GAP: int = 5
 ROLL_GAP: int = 30
 GAME_OVER_ALPHA: int = 70
-HOVER_ALPHA: int = 70
+HOVER_ALPHA: int = 100
 REQUIRED_WORDS_ALPHA: int = 50
 BACKGROUND_ALPHA: int = 130
-ROLL_SIZE_RATIO: float = 0.7
 
 # -- Sounds --
 BACK_BUTTON_CLICK: str = "assets/sounds/back-button-click.wav"
