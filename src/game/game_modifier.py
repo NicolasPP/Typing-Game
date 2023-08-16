@@ -68,6 +68,7 @@ class MultiplierModifier(StatModifier):
         return uniform(self.start_point, self.start_point + self.seg_size)
 
     def apply(self) -> None:
+        assert isinstance(self.stat, FloatCB), "stat must me FloatCB"
         multiplier: float = self.roll_multiplier()
         if self.type is StatModifierType.INCREASE:
             self.stat.set(self.stat.get() * multiplier)
@@ -79,9 +80,9 @@ class MultiplierModifier(StatModifier):
 class FixedModifier(StatModifier):
 
     def __init__(self, stat: PossibleStats, name: str, description: str, stat_type: StatModifierType,
-                 amount: int | float) -> None:
+                 amount: int) -> None:
         super().__init__(stat, name, description, stat_type)
-        self.amount: int | float = amount
+        self.amount: int = amount
 
     def apply(self) -> None:
         assert not isinstance(self.stat, BoolCB), "stat can not be a boolean"
@@ -157,6 +158,6 @@ class GameModifier:
 
 def get_words_completed(level: int | None = None) -> int:
     if level is None:
-        level: int = GameStats.get().level_num.get()
+        level = GameStats.get().level_num.get()
     words_req: int = GameStats.get().words_required.get()
     return int(BASE_WORDS_PER_LEVEL * ((level * (level + 1)) / 2)) + words_req

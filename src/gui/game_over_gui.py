@@ -32,6 +32,7 @@ class GameOverGui(GuiComponent):
         self.retry_button.rect.y -= + (GUI_GAP * 10)
 
     def update_game_over_theme(self) -> None:
+        if self.surface is None: return
         self.surface.fill(ThemeManager.get_theme().background_primary)
 
     def render(self) -> None:
