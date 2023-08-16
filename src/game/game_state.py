@@ -107,6 +107,7 @@ class GameState:
     def process_key_code(self, key_code: int) -> None:
         current_text: Text | None = self.get_current_text()
         stats: Stats = GameStats.get()
+        if stats.is_rolling.get(): return
         if stats.game_over.get(): return
         if current_text is None: return
         key_name: str = name(key_code)
