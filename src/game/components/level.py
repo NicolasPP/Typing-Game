@@ -153,6 +153,7 @@ class LevelManager:
         elif self.state is LevelState.SHOW_DEBUFF_ROLL:
             if self.debuff_roll is None: self.set_debuff_roll()
             assert self.debuff_roll is not None, "debuff roll object is missing"
+            assert self.buff_roll is not None, "debuff roll object is missing"
             if fade_overtime(self.debuff_roll, delta_time):
                 self.state = LevelState.HIDE_ALL_ROLLS
                 self.debuff_roll.fade_info.direction = FadeDirection.OUT
@@ -236,6 +237,7 @@ class LevelManager:
                 button.rect.x += (GUI_GAP * 4)
             prev_rect = button.rect
 
+        assert prev_rect is not None
         max_w_b.rect.center = rect.w // 2, rect.h // 2
         max_w_b.rect.top = prev_rect.bottom
         max_w_b.rect.y += (GUI_GAP * 4)
@@ -256,6 +258,7 @@ class LevelManager:
             self.debuff_roll.render(board_surface, self.board_rect)
 
     def buff_button_click(self, mod: StatModifier) -> None:
+        assert self.buff_roll is not None, "buff roll obj missing"
         self.state = LevelState.SHOW_DEBUFF_ROLL
         self.buff_roll.alpha = self.buff_roll.fade_info.max_alpha
         self.buff_roll.surface.set_alpha(self.buff_roll.fade_info.max_alpha)
@@ -279,6 +282,7 @@ def fade_overtime(fade_obj: WordsReq | Roll, delta_time: float) -> bool:
             fade_obj.alpha = fade_obj.fade_info.min_alpha
             return True
 
+    assert fade_obj.surface is not None
     fade_obj.surface.set_alpha(int(fade_obj.alpha))
     return False
 
