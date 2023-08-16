@@ -50,6 +50,7 @@ class ButtonGui:
         self.hover_surface: Surface = self.create_hover_surface()
         self.rect: Rect = self.surface.get_rect()
         self.call_backs: dict[int, list[Callable[[], None]]] = {}
+        self.is_hover_enabled: bool = True
         ThemeManager.add_call_back(self.update_button_theme)
 
     def update_button_theme(self) -> None:
@@ -58,7 +59,7 @@ class ButtonGui:
 
     def configure(self, label_color: tuple[int, int, int] | None = None,
                   hover_color: tuple[int, int, int] | None = None, hover_alpha: int | None = None,
-                  font_size: int | None = None) -> None:
+                  font_size: int | None = None, is_hover_enabled: bool | None = None) -> None:
         if label_color is not None:
             self.cfg.label_color = label_color
 
@@ -70,6 +71,9 @@ class ButtonGui:
 
         if hover_alpha is not None:
             self.cfg.hover_alpha = hover_alpha
+
+        if is_hover_enabled is not None:
+            self.is_hover_enabled = is_hover_enabled
 
         self.surface = self.create_surface()
         self.hover_surface = self.create_hover_surface()
@@ -95,6 +99,7 @@ class ButtonGui:
 
     def render(self, parent_surface: Surface, offset: tuple[int, int] = (0, 0)) -> None:
         parent_surface.blit(self.surface, self.rect)
+        if not self.is_hover_enabled: return
         if self.is_collided(offset):
             parent_surface.blit(self.hover_surface, self.rect)
 
