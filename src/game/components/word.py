@@ -18,6 +18,10 @@ class Word:
         self.rect: Rect = Rect(0, 0, *self.surface.get_size())
         self.pos: Vector2 = Vector2(0, 0)
         self.pressed_key_index: int = 0
+        ThemeManager.add_call_back(self.update_word_theme)
+
+    def update_word_theme(self) -> None:
+        self.surface = self.create_surface()
 
     def add_char(self, key: str) -> bool:
         if self.pressed_key_index >= len(self.letters): return False

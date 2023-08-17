@@ -20,15 +20,15 @@ class StatsGui(GuiComponent):
         stats: Stats = GameStats.get()
         self.font: Font = FontManager.get_font(DEFAULT_FONT_SIZE)
 
-        self.score_surface: Surface | None = None
-        self.score_rect: Rect | None = None
+        self.level_num_surface: Surface | None = None
+        self.level_num_rect: Rect | None = None
         self.speed_surface: Surface | None = None
         self.speed_rect: Rect | None = None
         self.spawn_delay_surface: Surface | None = None
         self.spawn_rect: Rect | None = None
 
-        self.update_score_surface(stats.words_right.get())
-        stats.words_right.add_callback(self.update_score_surface)
+        self.update_level_num_surface(stats.level_num.get())
+        stats.level_num.add_callback(self.update_level_num_surface)
 
         self.update_speed_surface(stats.fall_speed.get())
         stats.fall_speed.add_callback(self.update_speed_surface)
@@ -36,13 +36,20 @@ class StatsGui(GuiComponent):
         self.update_spawn_delay_surface(stats.spawn_delay.get())
         stats.spawn_delay.add_callback(self.update_spawn_delay_surface)
 
-    def update_score_surface(self, score: int) -> None:
+        level_name: str = "update level num theme"
+        ThemeManager.add_call_back(lambda: self.update_level_num_surface(stats.level_num.get()), name=level_name)
+        speed_name: str = "update speed theme"
+        ThemeManager.add_call_back(lambda: self.update_speed_surface(stats.fall_speed.get()), name=speed_name)
+        spawn_name: str = "update spawn delay theme"
+        ThemeManager.add_call_back(lambda: self.update_spawn_delay_surface(stats.spawn_delay.get()), name=spawn_name)
+
+    def update_level_num_surface(self, score: int) -> None:
         theme: Theme = ThemeManager.get_theme()
         surface: Surface = self.font.render(str(score), True, theme.foreground_primary, theme.background_primary)
 
-        self.score_surface = surface
-        self.score_rect = surface.get_rect(midtop=self.board_rect.midbottom)
-        self.score_rect.y += (GUI_GAP * 2)
+        self.level_num_surface = surface
+        self.level_num_rect = surface.get_rect(midtop=self.board_rect.midbottom)
+        self.level_num_rect.y += (GUI_GAP * 2)
 
     def update_speed_surface(self, speed: float) -> None:
         theme: Theme = ThemeManager.get_theme()
@@ -69,6 +76,6 @@ class StatsGui(GuiComponent):
             if surf is None or rect is None: return
             Window.get_surface().blit(surf, rect)
 
-        render_stat(self.score_surface, self.score_rect)
+        render_stat(self.level_num_surface, self.level_num_rect)
         render_stat(self.speed_surface, self.speed_rect)
         render_stat(self.spawn_delay_surface, self.spawn_rect)

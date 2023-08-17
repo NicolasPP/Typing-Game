@@ -1,6 +1,8 @@
+from pygame.event import Event
 from pygame.key import name
 
 from game.components.board import Board
+from game.components.letter import Letter
 from game.components.level import LevelManager
 from game.components.text import Text
 from game.game_stats import GameStats
@@ -8,7 +10,7 @@ from game.game_stats import Stats
 from utils.accumulator import Accumulator
 from utils.sound_manager import AppSounds
 from utils.sound_manager import SoundManager
-from utils.word_data_manager import WordDataManager
+from utils.themes import ThemeManager
 
 
 class GameState:
@@ -16,33 +18,49 @@ class GameState:
     def __init__(self, board_width: int, board_height: int) -> None:
         self.board: Board = Board(board_width, board_height)
         self.spawn_accumulator: Accumulator = Accumulator(GameStats.get().spawn_delay.get())
+        self.level_manager: LevelManager = LevelManager(self.board.rect)
 
         self.texts: list[Text] = []
-        self.played_words: list[str] = []
-
         self.stop_spawning: bool = False
         self.game_over: bool = False
         self.current_text: Text | None = None
 
         GameStats.get().lives.add_callback(self.end_game)
+        ThemeManager.add_call_back(Letter.load_state_colors)
+        ThemeManager.add_call_back(self.update_state_theme, 1)
+
+    def update_state_theme(self) -> None:
+        current_text: Text | None = self.get_current_text()
+        if current_text is None: return
+        current_text.get_current_word().underline()
 
     def render(self) -> None:
         self.board.clear()
-        if not GameStats.get().game_over.get():
-            for text in self.texts:
-                text.render(self.board.surface)
+        for text in self.texts:
+            text.render(self.board.surface)
+        self.level_manager.render(self.board.surface)
         self.board.render()
+
+    def parse_event(self, event: Event) -> None:
+        self.level_manager.parse_event(event)
 
     def update(self, delta_time: float) -> None:
         stats: Stats = GameStats.get()
         if stats.game_over.get(): return
+        is_rolling: bool = self.level_manager.is_rolling
+        self.level_manager.update(delta_time)
 
-        if self.spawn_accumulator.wait(delta_time):
+        # TODO: add buff that activates this.
+        # if is_rolling and len(self.texts) > 0:
+        #     self.texts.clear()
+
+        if self.spawn_accumulator.wait(delta_time) and not is_rolling:
             self.spawn_text()
 
         # update words
-        for text in self.texts:
-            text.fall(delta_time)
+        if not stats.is_rolling.get():
+            for text in self.texts:
+                text.fall(delta_time)
 
         current_text: Text | None = self.get_current_text()
         if current_text is None: return
@@ -56,27 +74,18 @@ class GameState:
 
     def reset(self) -> None:
         self.texts.clear()
+        self.level_manager.reset()
         GameStats.reset(self.board.rect.width)
 
-    def add_text(self, word_values: list[str]) -> None:
-        text: Text = Text(word_values)
+    def add_text(self, text: Text) -> None:
         text.set_random_pos(self.board.rect.width)
         if len(self.texts) == 0: text.underline_current_word()
         self.texts.append(text)
 
     def spawn_text(self) -> None:
         if self.stop_spawning: return
-        word_values: list[str] = []
-
-        text_length: int = LevelManager.roll_text_length()
-        word_lengths: list[int] = LevelManager.roll_word_lengths()
-
-        while len(word_values) < text_length:
-            word_val: str = WordDataManager.get_random_word(played_words=self.played_words, word_lengths=word_lengths)
-            word_values.append(word_val)
-            self.played_words.append(word_val)
-
-        self.add_text(word_values)
+        text: Text = self.level_manager.get_text()
+        self.add_text(text)
 
     def remove_fist_text(self) -> None:
         self.texts = self.texts[1:]
@@ -98,6 +107,7 @@ class GameState:
     def process_key_code(self, key_code: int) -> None:
         current_text: Text | None = self.get_current_text()
         stats: Stats = GameStats.get()
+        if stats.is_rolling.get(): return
         if stats.game_over.get(): return
         if current_text is None: return
         key_name: str = name(key_code)
@@ -115,10 +125,11 @@ class GameState:
             stats.combo_fill.increment(float(word_length) * stats.combo_multiplier.get())
             current_text.remove_word()
             current_text.update_counter_surface()
-            stats.words_right.increment(1)
+            stats.words_required.increment(-1)
             SoundManager.play(AppSounds.COMPLETE_WORD)
 
     def end_game(self, lives_count: int) -> None:
         if lives_count <= 0:
             GameStats.get().game_over.set(True)
-            self.board.clear()
+            self.texts.clear()
+            self.level_manager.words_req.req_render = False

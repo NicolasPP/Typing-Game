@@ -36,10 +36,10 @@ class Window:
     def __init__(self) -> None:
         self.surface: Surface = display.set_mode((GAME_SCREEN_WIDTH, GAME_SCREEN_HEIGHT))
         self.config: GameScreenConfig = Window.get_config()
-        ThemeManager.add_call_back(self.theme_call_back)
+        ThemeManager.add_call_back(self.update_window_theme)
 
     def clear(self) -> None:
         self.surface.fill(self.config.background_color)
 
-    def theme_call_back(self) -> None:
+    def update_window_theme(self) -> None:
         self.config.background_color = ThemeManager.get_theme().background_primary

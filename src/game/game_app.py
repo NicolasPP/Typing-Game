@@ -7,6 +7,7 @@ from pygame import font
 from pygame import mixer
 
 from game.components.letter import Letter
+from game.game_modifier import GameModifier
 from gui.pages.game_page import GamePage
 from gui.pages.menu_page import MenuPage
 from gui.pages.page import Page
@@ -27,6 +28,7 @@ class GameApp:
         Letter.load_state_colors()
         WordDataManager.load_words()
         SoundManager.load_sounds()
+        GameModifier.load_modifiers()
 
         self.page_manager: PageManager = PageManager()
         self.done: bool = False

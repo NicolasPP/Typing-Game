@@ -10,3 +10,5 @@ LIGHT_BACKGROUND_SECONDARY: tuple[int, int, int] = (255, 255, 255)
 
 CORRECT_COLOR: tuple[int, int, int] = 0, 255, 0
 WRONG_COLOR: tuple[int, int, int] = 255, 0, 0
+
+DEBUFF_COLOR: tuple[int, int, int] = 255, 0, 0

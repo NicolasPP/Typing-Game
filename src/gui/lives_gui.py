@@ -28,14 +28,20 @@ class LifeCombo:
         self.rect.y -= (GUI_GAP * 2)
         stats: Stats = GameStats.get()
         self.full_lives: bool = stats.lives.get() == stats.life_pool.get()
+        stats.life_pool.add_callback(lambda val: self.update_fill_width())
         if self.full_lives:
             stats.combo_fill.set(float(self.rect.width))
         else:
             stats.combo_fill.set(0.0)
-        stats.lives.add_callback(self.update_full_lives)
+        stats.lives.add_callback(lambda val: self.update_full_lives())
+        stats.life_pool.add_callback(lambda val: self.update_full_lives())
+        ThemeManager.add_call_back(self.color_surface, name="update combo theme")
 
-    def update_full_lives(self, lives: int) -> None:
-        self.full_lives = lives == GameStats.get().life_pool.get()
+    def update_fill_width(self) -> None:
+        self.set_fill_width(0)
+
+    def update_full_lives(self) -> None:
+        self.full_lives = GameStats.get().lives.get() == GameStats.get().life_pool.get()
 
     def render(self) -> None:
         if GameStats.get().combo_fill.get() == 0.0: return
@@ -47,7 +53,6 @@ class LifeCombo:
             stats.combo_fill.set(0.0)
         elif fill_width >= self.rect.width:
             stats.combo_fill.set(float(self.rect.width))
-
             if not self.full_lives:
                 GameStats.get().lives.increment(1)
                 SoundManager.play(AppSounds.GAIN_LIFE)
@@ -59,13 +64,17 @@ class LifeCombo:
             stats.combo_fill.set(fill_width)
 
         self.surface = Surface((ceil(stats.combo_fill.get()), self.rect.height))
-        self.surface.fill(ThemeManager.get_theme().foreground_primary)
+        self.color_surface()
 
     def update(self, delta_time: float) -> None:
         stats: Stats = GameStats.get()
+        if stats.is_rolling.get(): return
         if stats.lives.get() == stats.life_pool.get(): return
         self.set_fill_width(stats.combo_fill.get() - (stats.combo_speed.get() * delta_time))
         self.surface = Surface((ceil(stats.combo_fill.get()), self.rect.height))
+        self.color_surface()
+
+    def color_surface(self) -> None:
         self.surface.fill(ThemeManager.get_theme().foreground_primary)
 
 
@@ -87,6 +96,7 @@ class LivesGui(GuiComponent):
         self.update_surface()
         stats.life_pool.add_callback(lambda val: self.update_surface())
         stats.lives.add_callback(lambda val: self.update_surface())
+        ThemeManager.add_call_back(self.update_surface, name="update hearts theme")
 
     def update_surface(self) -> None:
         stats: Stats = GameStats.get()
