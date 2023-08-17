@@ -62,7 +62,8 @@ MAX_STAT_MULT: float = 1.60
 STAT_MULT_SEG_SIZE: float = 0.1
 STAT_MOD_AMOUNT: int = 3
 MAX_MODIFIER_LEVEL: int = 15
+MAX_STORED_SCORES: int = 50
 
 # -- files --
 WORDS_FILE: str = "data/words/words_frequency.txt"
-WORDS_FILE_MODE: str = "r"
+SCORE_FILE: str = "data/user/scores.txt"

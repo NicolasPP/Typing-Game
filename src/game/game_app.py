@@ -8,6 +8,7 @@ from pygame import mixer
 
 from game.components.letter import Letter
 from game.game_modifier import GameModifier
+from game.game_score import GameScores
 from gui.pages.game_page import GamePage
 from gui.pages.menu_page import MenuPage
 from gui.pages.page import Page
@@ -29,6 +30,7 @@ class GameApp:
         WordDataManager.load_words()
         SoundManager.load_sounds()
         GameModifier.load_modifiers()
+        GameScores.load_scores()
 
         self.page_manager: PageManager = PageManager()
         self.done: bool = False
