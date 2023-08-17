@@ -156,8 +156,9 @@ class GameModifier:
         return debuffs
 
 
-def get_words_completed(level: int | None = None) -> int:
+def get_words_completed(level: int | None = None, words_req: int | None = None) -> int:
     if level is None:
         level = GameStats.get().level_num.get()
-    words_req: int = GameStats.get().words_required.get()
+    if words_req is None:
+        words_req = GameStats.get().words_required.get()
     return int(BASE_WORDS_PER_LEVEL * ((level * (level + 1)) / 2)) + words_req
