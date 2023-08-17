@@ -3,7 +3,6 @@ from typing import Type
 from typing import TypeAlias
 
 from config.game_config import WORDS_FILE
-from config.game_config import WORDS_FILE_MODE
 
 DataTypes: TypeAlias = str | float | int
 
