@@ -25,7 +25,6 @@ class GameState:
         self.game_over: bool = False
         self.current_text: Text | None = None
 
-        GameStats.get().lives.add_callback(self.end_game)
         ThemeManager.add_call_back(Letter.load_state_colors)
         ThemeManager.add_call_back(self.update_state_theme, 1)
 
@@ -128,9 +127,3 @@ class GameState:
             current_text.update_counter_surface()
             stats.words_required.increment(-1)
             SoundManager.play(AppSounds.COMPLETE_WORD)
-
-    def end_game(self, lives_count: int) -> None:
-        if lives_count <= 0:
-            GameStats.get().game_over.set(True)
-            self.texts.clear()
-            self.level_manager.words_req.req_render = False

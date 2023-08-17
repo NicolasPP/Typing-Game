@@ -9,6 +9,9 @@ from config.game_config import BOARD_HEIGHT
 from config.game_config import BOARD_WIDTH
 from game.game_state import GameState
 from game.game_stats import GameStats
+from game.game_stats import Stats
+from game.game_score import GameScores
+from game.game_score import Score
 from gui.button_gui import ButtonEvent
 from gui.game_over_gui import GameOverGui
 from gui.lives_gui import LivesGui
@@ -35,6 +38,7 @@ class GamePage(Page):
         self.gui.game_over.retry_button.add_call_back(ButtonEvent.LEFT_CLICK, self.state.reset)
         self.gui.game_over.back_button.add_call_back(ButtonEvent.LEFT_CLICK, self.state.reset)
         self.gui.game_over.back_button.add_call_back(ButtonEvent.LEFT_CLICK, lambda: self.change_page("MenuPage"))
+        GameStats.get().lives.add_callback(self.end_game)
 
     def render(self) -> None:
         self.state.render()
@@ -55,3 +59,13 @@ class GamePage(Page):
     def update(self, delta_time: float) -> None:
         self.state.update(delta_time)
         self.gui.lives.update(delta_time)
+
+    def end_game(self, lives_count: int) -> None:
+        if lives_count <= 0:
+            stats: Stats = GameStats.get()
+            stats.game_over.set(True)
+            self.state.texts.clear()
+            self.state.level_manager.words_req.req_render = False
+            score: Score = Score(stats.level_num.get(), stats.words_required.get())
+            GameScores.add_score(score)
+            # self.gui.game_over.set_score(score)
