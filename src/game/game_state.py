@@ -47,14 +47,15 @@ class GameState:
     def update(self, delta_time: float) -> None:
         stats: Stats = GameStats.get()
         if stats.game_over.get(): return
-        is_rolling: bool = self.level_manager.is_rolling
-        self.level_manager.update(delta_time)
+        if self.level_manager.is_rolling:
+            self.level_manager.update(delta_time)
+            return
 
         # TODO: add buff that activates this.
         # if is_rolling and len(self.texts) > 0:
         #     self.texts.clear()
 
-        if self.spawn_accumulator.wait(delta_time) and not is_rolling:
+        if self.spawn_accumulator.wait(delta_time):
             self.spawn_text()
 
         # update words

@@ -186,12 +186,12 @@ class LevelManager:
         elif self.state is LevelState.HIDE_REQ_NUM:
             if self.words_req.fade_overtime(delta_time):
                 self.words_req.fade_info.direction = FadeDirection.IN
-                GameStats.get().words_required.set(self.words_per_level)
                 self.state = LevelState.SHOW_BUFF_ROLL
                 self.words_per_level += BASE_WORDS_PER_LEVEL
                 self.words_req.req_render = False
                 self.parse_button_events = True
                 self.background.req_render = True
+                GameStats.get().words_required.set(self.words_per_level)
 
         elif self.state is LevelState.SHOW_BUFF_ROLL:
             if self.buff_roll is None: self.set_buff_roll()

@@ -43,6 +43,7 @@ class Text:
 
     def render(self, parent_surface: Surface) -> None:
         if self.counter_surface is None: return
+        if self.is_done(): return
         current_word: Word = self.get_current_word()
         current_word.render(parent_surface)
         if len(self.words) == 1: return
