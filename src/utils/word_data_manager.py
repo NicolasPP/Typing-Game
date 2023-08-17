@@ -17,7 +17,7 @@ class WordDataManager:
         # https://www.wordfrequency.info/samples.asp
         # freq_data: list[dict[str, DataTypes]] = []  # ordered by freq
         common_words: list[str] = []
-        with open(WORDS_FILE, WORDS_FILE_MODE) as file:
+        with open(WORDS_FILE, "r") as file:
             fields: list[str] = file.readline().split()
             row: str = file.readline()
             while row:
