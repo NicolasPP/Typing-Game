@@ -13,7 +13,6 @@ from gui.pages.game_page import GamePage
 from gui.pages.menu_page import MenuPage
 from gui.pages.page import Page
 from gui.pages.page_manager import PageManager
-from gui.pages.score_page import ScorePage
 from utils.sound_manager import SoundManager
 from utils.themes import ThemeManager
 from utils.window import Window
@@ -39,7 +38,6 @@ class GameApp:
 
         self.page_manager.add_page(MenuPage)
         self.page_manager.add_page(GamePage)
-        self.page_manager.add_page(ScorePage)
         self.page_manager.set_page("MenuPage")
 
     def set_delta_time(self) -> None:
