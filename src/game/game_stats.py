@@ -2,18 +2,18 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from config.game_config import BASE_COMBO_MULTIPLIER
+from config.game_config import BASE_COMBO_SPEED
 from config.game_config import BASE_LIFE_POOL
 from config.game_config import BASE_LIVES_COUNT
-from config.game_config import MAX_LIFE_POOL
-from config.game_config import SPAWN_DELAY
 from config.game_config import BASE_SPEED
-from config.game_config import BASE_COMBO_SPEED
-from config.game_config import BASE_COMBO_MULTIPLIER
-from config.game_config import MAX_COMBO_MULTIPLIER
+from config.game_config import BASE_TEXT_LENGTH
 from config.game_config import BASE_WORDS_PER_LEVEL
 from config.game_config import BASE_WORD_LENGTH
-from config.game_config import BASE_TEXT_LENGTH
+from config.game_config import MAX_COMBO_MULTIPLIER
+from config.game_config import MAX_LIFE_POOL
 from config.game_config import MAX_TEXT_LENGTH
+from config.game_config import SPAWN_DELAY
 from utils.callback_vars import BoolCB
 from utils.callback_vars import FloatCB
 from utils.callback_vars import IntCB
@@ -35,6 +35,7 @@ class Stats:
     combo_fill: FloatCB = FloatCB(0.0)
     combo_multiplier: FloatCB = FloatCB(BASE_COMBO_MULTIPLIER)
     is_rolling: BoolCB = BoolCB(False)
+    is_scores_empty: BoolCB = BoolCB(True)
 
 
 class GameStats:

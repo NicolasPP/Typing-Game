@@ -5,6 +5,7 @@ from pickle import load
 from config.game_config import MAX_STORED_SCORES
 from config.game_config import SCORE_FILE
 from game.game_modifier import get_words_completed
+from game.game_stats import GameStats
 
 
 @dataclass
@@ -19,25 +20,37 @@ class GameScores:
     @staticmethod
     def load_scores() -> None:
         with open(SCORE_FILE, "rb") as score_file:
-            if not score_file.read():
-                GameScores.scores = []
-            else:
-                GameScores.scores = load(score_file)
+            try:
+                GameScores.set(load(score_file))
+            except EOFError:
+                GameScores.set([])
         GameScores.sort()
 
     @staticmethod
+    def set(scores: list[Score]) -> None:
+        GameScores.scores = scores
+        GameStats.get().is_scores_empty.set(len(scores) == 0)
+
+    @staticmethod
     def add_score(score: Score) -> None:
-        GameScores.get().append(score)
+        scores: list[Score] = GameScores.get()
+        scores.append(score)
+        GameScores.set(scores)
         GameScores.sort()
 
         if len(GameScores.get()) > MAX_STORED_SCORES:
-            GameScores.scores = GameScores.get()[:MAX_STORED_SCORES]
+            GameScores.set(GameScores.get()[:MAX_STORED_SCORES])
 
         GameScores.write_scores()
 
     @staticmethod
     def get() -> list[Score]:
         return GameScores.scores
+
+    @staticmethod
+    def get_top_score() -> Score | None:
+        if len(GameScores.get()) == 0: return None
+        return GameScores.get()[-1]
 
     @staticmethod
     def write_scores() -> None:
