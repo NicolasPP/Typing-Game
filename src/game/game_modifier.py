@@ -6,12 +6,12 @@ from random import choice
 from random import uniform
 from typing import TypeAlias
 
+from config.game_config import BASE_WORDS_PER_LEVEL
+from config.game_config import MAX_MODIFIER_LEVEL
 from config.game_config import MAX_STAT_MULT
 from config.game_config import MIN_STAT_MULT
 from config.game_config import STAT_MOD_AMOUNT
 from config.game_config import STAT_MULT_SEG_SIZE
-from config.game_config import BASE_WORDS_PER_LEVEL
-from config.game_config import MAX_MODIFIER_LEVEL
 from game.game_stats import GameStats
 from game.game_stats import Stats
 from utils.callback_vars import BoolCB
@@ -161,4 +161,5 @@ def get_words_completed(level: int | None = None, words_req: int | None = None) 
         level = GameStats.get().level_num.get()
     if words_req is None:
         words_req = GameStats.get().words_required.get()
-    return int(BASE_WORDS_PER_LEVEL * ((level * (level + 1)) / 2)) + words_req
+    words_left: int = (level + 1) * BASE_WORDS_PER_LEVEL - words_req
+    return int(BASE_WORDS_PER_LEVEL * ((level * (level + 1)) / 2)) + words_left
