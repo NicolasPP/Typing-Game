@@ -8,7 +8,7 @@ CallbackTypes: TypeAlias = str | int | bool | float
 class CallBack:
     def __init__(self, value: CallbackTypes) -> None:
         self.value: CallbackTypes = value
-        self.callbacks: set[Callable[[Any], None]] = set()
+        self.callbacks: list[Callable[[Any], None]] = []
 
     def set(self, value: Any) -> None:
         assert isinstance(value, type(self.value)), f"expected {type(self.value).__name__}, got {type(value).__name__}"
@@ -21,7 +21,7 @@ class CallBack:
 
     def add_callback(self, callback_func: Callable[[Any], None]) -> None:
         if callback_func in self.callbacks: return
-        self.callbacks.add(callback_func)
+        self.callbacks.append(callback_func)
 
 
 class IntCB(CallBack):
